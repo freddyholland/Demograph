@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>678335449428-lrmmtcjr3fb2q5u1hfrks1ekue5lc087.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.678335449428-lrmmtcjr3fb2q5u1hfrks1ekue5lc087</string>
+	<key>API_KEY</key>
+	<string>AIzaSyClZwxXn2C1yIgCpQ01yZ5dhb-Q62bwG4o</string>
+	<key>GCM_SENDER_ID</key>
+	<string>678335449428</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.holland.Demograph</string>
+	<key>PROJECT_ID</key>
+	<string>demograph-edb86</string>
+	<key>STORAGE_BUCKET</key>
+	<string>demograph-edb86.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:678335449428:ios:9fe1cf55bcc858ab62a0c1</string>
+	<key>DATABASE_URL</key>
+	<string>https://demograph-edb86.firebaseio.com</string>
+</dict>
+</plist>
