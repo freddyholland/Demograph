@@ -77,7 +77,7 @@ class Clip {
         doc.setData(data)
     }
     
-    public static func getClip(from: Int, completion: (_ clip: Clip) -> Void) {
+    public static func getClip(from: Int, completion: @escaping (_ clip: Clip) -> Void) {
         // Enter database and retrieve clip from ID.
         // Return this clip.
         // MARK: - Work in progress.
@@ -90,11 +90,26 @@ class Clip {
             
             //let _ = Clip(url: *, title: *, date: *, time: *, platform: *, platformTag: *, id: *, tags: *, votes: -)
             if(snapshot?.get("title") != nil) {
+                let title:String = snapshot?.get("title") as! String
+                let url:String = snapshot?.get("url") as! String
+                let date:String = snapshot?.get("date") as! String
+                let time:String = snapshot?.get("time") as! String
+                let platform_tag:String = snapshot?.get("platformTag") as! String
+                let platform:Platforms = Platforms(rawValue: snapshot?.get("platform") as! String)!
+                var tags:[Tag] = []
+                for tagString in snapshot?.get("tags") as! [String] {
+                    tags.append(Tag(name: tagString))
+                }
+                completion(Clip(url: url, title: title, date: date, time: time, platform: platform, platformTag: platform_tag, id: from, tags: tags, votes: []))
+                
+                /*if snapshot?.get("votes") != nil {
+                    let votes = snapshot?.get("votes")
+                }*/
             }
         })
     }
     
-    public static func loadClips(range: Int) -> [Clip] {
+    public static func loadClips(range: Int, completion: (_ loaded: [Clip]) -> Void) {
         for _ in 0...range {
             // Retrieve most recent list.
             // Access indexes 0 to range in recent list.
@@ -103,10 +118,9 @@ class Clip {
         }
         
         //return Placeholders.userAccount.clips
-        return []
     }
     
-    public static func loadClips(range: [Int]) -> [Clip] {
+    public static func loadClips(range: [Int], completion: (_ loaded: [Clip]) -> Void) {
         for _ in range {
             // Get clip with ID index.
             // Compile a list of [Clip].
@@ -115,10 +129,9 @@ class Clip {
         }
         
         //return Placeholders.userAccount.clips
-        return []
     }
     
-    public static func loadHotClips(range: Int) -> [Clip] {
+    /*public static func loadHotClips(range: Int) -> [Clip] {
         let allClips = loadClips(range: range)
         var unorderedList: [Int:Int] = [:]
         for clip in allClips {
@@ -135,7 +148,7 @@ class Clip {
         }
         
         return returningClips
-    }
+    }*/
     
     public static func getMalleableList(forClips: [Clip]) -> [Int:[Tag]] {
         var returningList: [Int:[Tag]] = [:]
@@ -146,7 +159,7 @@ class Clip {
         return returningList
     }
     
-    public static func identifyClips(with: [Tag]) -> [(key:Int,value:Int)] {
+    /*public static func identifyClips(with: [Tag]) -> [(key:Int,value:Int)] {
         
         var unorderedList: [Int:Int] = [:]
         let clips = getMalleableList(forClips: loadClips(range: 20))
@@ -169,5 +182,5 @@ class Clip {
         let orderedList = unorderedList.sorted { $1.1 > $0.1}
         
         return orderedList
-    }
+    }*/
 }

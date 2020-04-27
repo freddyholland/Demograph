@@ -15,10 +15,18 @@ class ExploreTableView: UITableViewController {
     @IBOutlet weak var supportingButton: UIButton!
     var selected_button:UIButton = UIButton()
     
+    var clipsToLoad = [1]
+    var loadedClips: [Clip] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setSelectedButton(b: newButton)
+        Clip.loadClips(range: clipsToLoad, completion: {
+            (loaded) in
+            loadedClips = loaded
+            tableView.reloadData()
+        })
     }
 
     // MARK: - Table view data source
@@ -31,11 +39,12 @@ class ExploreTableView: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         // MARK: - Will be replaced in near future.
-        return Placeholders.userAccount.clips!.count
+        return loadedClips.count
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let clip:Clip = Clip.getClip(from: Placeholders.userAccount.clips![indexPath.row])
+        let clip:Clip = loadedClips[indexPath.row]
+        
         switch clip.platform {
         case .Instagram:
             return 205
@@ -52,7 +61,7 @@ class ExploreTableView: UITableViewController {
         print("Attempting to setup cell @ \(indexPath.row)")
         
         // Configure the cell...
-        let clip: Clip = Clip.getClip(from: Placeholders.userAccount.clips![indexPath.row])
+        let clip: Clip = loadedClips[indexPath.row]
         var identifier = clip.platform.rawValue + "_identifier"
         
         switch clip.platform {

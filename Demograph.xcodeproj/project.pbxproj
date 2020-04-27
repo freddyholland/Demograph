@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B512DECB2430320A007D34A0 /* VideoTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B512DECA2430320A007D34A0 /* VideoTableCell.swift */; };
+		B5139BDB24567DF40088565A /* ImagePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5139BDA24567DF40088565A /* ImagePickerController.swift */; };
 		B56DA7C2242C9B090089497C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56DA7C1242C9B090089497C /* AppDelegate.swift */; };
 		B56DA7C9242C9B090089497C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B56DA7C7242C9B090089497C /* Main.storyboard */; };
 		B56DA7CB242C9B0C0089497C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B56DA7CA242C9B0C0089497C /* Assets.xcassets */; };
@@ -41,6 +42,7 @@
 		7F31163C8BB1679847BF7B4B /* Pods_Demograph_Prototype.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Demograph_Prototype.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86A16D8063F8A606E90F24B4 /* Pods-Demograph.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demograph.debug.xcconfig"; path = "Target Support Files/Pods-Demograph/Pods-Demograph.debug.xcconfig"; sourceTree = "<group>"; };
 		B512DECA2430320A007D34A0 /* VideoTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoTableCell.swift; sourceTree = "<group>"; };
+		B5139BDA24567DF40088565A /* ImagePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerController.swift; sourceTree = "<group>"; };
 		B56DA7BE242C9B090089497C /* Demograph.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demograph.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B56DA7C1242C9B090089497C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B56DA7C8242C9B090089497C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 				B5E8B9DD24346A8900723F15 /* LoginController.swift */,
 				B5E8B9DF24346AA700723F15 /* SignupController.swift */,
 				B5E2DB8F24552D00005EC889 /* SettingsTableView.swift */,
+				B5139BDA24567DF40088565A /* ImagePickerController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -311,6 +314,7 @@
 				B56DA7C2242C9B090089497C /* AppDelegate.swift in Sources */,
 				B5E8B9DA2434200800723F15 /* Placeholders.swift in Sources */,
 				B5E2DB9024552D00005EC889 /* SettingsTableView.swift in Sources */,
+				B5139BDB24567DF40088565A /* ImagePickerController.swift in Sources */,
 				B56DA7D6242CD07C0089497C /* ExploreTableView.swift in Sources */,
 				B5E8B9CF24330B4D00723F15 /* Platform.swift in Sources */,
 				B5E8B9CD2432F43100723F15 /* PlatformTableCell.swift in Sources */,
