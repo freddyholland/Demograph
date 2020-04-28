@@ -200,8 +200,16 @@ class SettingsTableView: UITableViewController {
             self.present(alertController, animated: true, completion: nil)
         } else if row == 3 {
             // MARK:- PICTURE
+            let imageController = self.storyboard?.instantiateViewController(withIdentifier: "imagePicker") as! ImagePickerController
+            imageController.instance = self
+            imageController.id = 1
+            self.present(imageController, animated: true, completion: nil)
         } else if row == 4 {
             // MARK:- BANNER
+            let imageController = self.storyboard?.instantiateViewController(withIdentifier: "imagePicker") as! ImagePickerController
+            imageController.instance = self
+            imageController.id = 2
+            self.present(imageController, animated: true, completion: nil)
         } else if row == 5 {
             // MARK:- MANAGE PLATFORMS
         } else if row == 6 {

@@ -49,7 +49,7 @@ class PublishController: UIViewController, UITextFieldDelegate {
          TAGS: -
          VOTES: N/A
          */
-        let clip = Clip(url: url, title: title, date: "", time: "", platform: platform, platformTag: "", id: 0, tags: [], votes: [])
+        let clip = Clip(url: url, title: title, date: "", time: "", platform: platform, platformTag: "", id: 0, thumbnail: "", tags: [], votes: [])
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

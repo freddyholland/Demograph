@@ -7,18 +7,23 @@
 //
 
 import Foundation
+import UIKit
 
 class Placeholders {
     
-    public static let userAccount = Profile(
-        id: "",
+    public static let userAccount = Profile(id: "",
         local_tag: "",
         name: "",
+        picture: UIImage(),
+        banner: UIImage(),
         platforms: [],
         bio: "",
-        supporters: ["","",""],
+        supporters: [],
         clips: [1])
     // Clip(url: "https://www.youtube.com/watch?v=tlvbnqVXgok", title: "THE SCOTTS, Travis Scott, Kid Cudi - THE SCOTTS (Inside)", date: "", time: "", platform: Platforms.Youtube, platformTag: "Travis Scott", id: 0, tags: [], votes: [])
+    
+    public static let picture = UIImage(named: "default_picture")
+    public static let banner = UIImage(named: "default_banner")
 }
 
 /*

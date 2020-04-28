@@ -12,15 +12,30 @@ class ImagePickerController: UIViewController, ImagePickerDelegate {
     
     func didSelect(image: UIImage?) {
         // Image has been selected.
+        switch id {
+        case 1:
+            // Change profile picture.
+            let profile = Profile.current
+            profile.picture = image
+            print("ID'd as case 1 - modification successful, attempting to save profile")
+            Account.savePicture(profile: profile)
+        case 2:
+            // Change banner picture.
+            let profile = Profile.current
+            profile.banner = image
+            Account.saveBanner(profile: profile)
+        default:
+            print("No value")
+        }
         imageView.image = image
     }
     
-    var selected: Bool = false
+    var id: Int = 0
+    var instance: SettingsTableView!
     
     @IBOutlet weak var imageView: UIImageView!
     
     var imagePicker: ImagePicker!
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,10 +45,6 @@ class ImagePickerController: UIViewController, ImagePickerDelegate {
     
     @IBAction func selectPressed(_ sender: UIButton) {
         imagePicker.present(from: sender)
-        selected = true
-        while !selected {
-            // wait for 
-        }
     }
     
     /*

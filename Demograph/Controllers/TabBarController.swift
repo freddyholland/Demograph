@@ -12,8 +12,11 @@ class TabBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         // Do any additional setup after loading the view.
+        
+        for item in tabBar.items! {
+            item.imageInsets = UIEdgeInsets.init(top: 5,left: 0,bottom: -5,right: 0)
+        }
     }
     
 

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		88272D582456EC5C00B2DFE6 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88272D572456EC5C00B2DFE6 /* TabBarController.swift */; };
+		88272D5A2457BE7200B2DFE6 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88272D592457BE7200B2DFE6 /* API.swift */; };
+		88272D5C2457BFC400B2DFE6 /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88272D5B2457BFC400B2DFE6 /* SwiftyJSON.swift */; };
 		B512DECB2430320A007D34A0 /* VideoTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B512DECA2430320A007D34A0 /* VideoTableCell.swift */; };
 		B5139BDB24567DF40088565A /* ImagePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5139BDA24567DF40088565A /* ImagePickerController.swift */; };
 		B56DA7C2242C9B090089497C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56DA7C1242C9B090089497C /* AppDelegate.swift */; };
@@ -41,6 +44,9 @@
 		175440E0C64E384A2828A037 /* Pods-Demograph-Prototype.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demograph-Prototype.release.xcconfig"; path = "Target Support Files/Pods-Demograph-Prototype/Pods-Demograph-Prototype.release.xcconfig"; sourceTree = "<group>"; };
 		7F31163C8BB1679847BF7B4B /* Pods_Demograph_Prototype.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Demograph_Prototype.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86A16D8063F8A606E90F24B4 /* Pods-Demograph.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demograph.debug.xcconfig"; path = "Target Support Files/Pods-Demograph/Pods-Demograph.debug.xcconfig"; sourceTree = "<group>"; };
+		88272D572456EC5C00B2DFE6 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		88272D592457BE7200B2DFE6 /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		88272D5B2457BFC400B2DFE6 /* SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyJSON.swift; sourceTree = "<group>"; };
 		B512DECA2430320A007D34A0 /* VideoTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoTableCell.swift; sourceTree = "<group>"; };
 		B5139BDA24567DF40088565A /* ImagePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerController.swift; sourceTree = "<group>"; };
 		B56DA7BE242C9B090089497C /* Demograph.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demograph.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -135,6 +141,7 @@
 				B56DA7CC242C9B0C0089497C /* LaunchScreen.storyboard */,
 				B56DA7CF242C9B0C0089497C /* Info.plist */,
 				B5D588BD2453160E0015922D /* GoogleService-Info.plist */,
+				88272D5B2457BFC400B2DFE6 /* SwiftyJSON.swift */,
 			);
 			path = Demograph;
 			sourceTree = "<group>";
@@ -150,6 +157,7 @@
 				B5E8B9DF24346AA700723F15 /* SignupController.swift */,
 				B5E2DB8F24552D00005EC889 /* SettingsTableView.swift */,
 				B5139BDA24567DF40088565A /* ImagePickerController.swift */,
+				88272D572456EC5C00B2DFE6 /* TabBarController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -177,6 +185,7 @@
 				B5EBB1642452DD0200803CEA /* Vote.swift */,
 				B5D588BF245323AF0015922D /* Account.swift */,
 				B5E2DB972455B363005EC889 /* ImagePicker.swift */,
+				88272D592457BE7200B2DFE6 /* API.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -302,6 +311,7 @@
 				B5E8B9DC2434467700723F15 /* VideoWebController.swift in Sources */,
 				B5E2DB982455B363005EC889 /* ImagePicker.swift in Sources */,
 				B5E8B9CB2432F23700723F15 /* ProfileTableView.swift in Sources */,
+				88272D582456EC5C00B2DFE6 /* TabBarController.swift in Sources */,
 				B5E8B9E024346AA700723F15 /* SignupController.swift in Sources */,
 				B5E8B9D824341F9C00723F15 /* Profile.swift in Sources */,
 				B5E41F202438166300504EA3 /* AudioTableCell.swift in Sources */,
@@ -314,10 +324,12 @@
 				B56DA7C2242C9B090089497C /* AppDelegate.swift in Sources */,
 				B5E8B9DA2434200800723F15 /* Placeholders.swift in Sources */,
 				B5E2DB9024552D00005EC889 /* SettingsTableView.swift in Sources */,
+				88272D5C2457BFC400B2DFE6 /* SwiftyJSON.swift in Sources */,
 				B5139BDB24567DF40088565A /* ImagePickerController.swift in Sources */,
 				B56DA7D6242CD07C0089497C /* ExploreTableView.swift in Sources */,
 				B5E8B9CF24330B4D00723F15 /* Platform.swift in Sources */,
 				B5E8B9CD2432F43100723F15 /* PlatformTableCell.swift in Sources */,
+				88272D5A2457BE7200B2DFE6 /* API.swift in Sources */,
 				B5D588C0245323AF0015922D /* Account.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -376,7 +388,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -437,7 +449,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;

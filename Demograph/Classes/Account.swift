@@ -22,7 +22,9 @@ class Account {
                 return
             }
             
-            Firestore.firestore().collection("users").document(user.uid).setData(["id":user.uid, "local_tag":local_tag.lowercased(),"name":name,"email":email])
+            let profile = Profile(id: user.uid, local_tag: local_tag.lowercased(), name: name, picture: Placeholders.picture!, banner: Placeholders.banner!, platforms: [], bio: "", supporters: [], clips: [])
+            saveProfile(profile: profile)
+            Firestore.firestore().collection("users").document(user.uid).setValue(email, forKey: "email")
             completionHandler(true, error)
         })
     }
@@ -67,7 +69,7 @@ class Account {
     }
     
     public static func getProfile(userID: String, completion: @escaping (_ user: Profile) -> Void) {
-        let profile = Profile(id: userID, local_tag: "", name: "", platforms: [], bio: "", supporters: [], clips: [])
+        let profile = Profile(id: userID, local_tag: "", name: "", picture: UIImage(), banner: UIImage(), platforms: [], bio: "", supporters: [], clips: [])
         
         Firestore.firestore().collection("users").document(userID).getDocument(completion: {
             (snapshot, error) in
@@ -88,6 +90,14 @@ class Account {
                 
                 if snapshot?.get("bio") != nil {
                     profile.bio = snapshot?.get("bio") as? String
+                }
+                
+                if snapshot?.get("picture") != nil {
+                    profile.picture = snapshot?.get("picture") as? UIImage
+                }
+                
+                if snapshot?.get("banner") != nil {
+                    profile.banner = snapshot?.get("banner") as? UIImage
                 }
                 
                 if snapshot?.get("platforms") != nil {
@@ -113,12 +123,20 @@ class Account {
     public static func saveProfile(profile: Profile) {
         print("### Recieved request to save Profile")
         let id = profile.id
-        var data: [String:Any] = ["local_tag":profile.local_tag.lowercased(),"name":profile.name,"bio":profile.bio!]
+        let data: [String:Any] = [
+            "local_tag":profile.local_tag.lowercased(),
+            "name":profile.name,
+            "bio":profile.bio!,
+            "clips":profile.clips!,
+            "platforms":profile.platforms!,
+            "picture":profile.picture?.pngData()!,
+            "banner":profile.banner!
+        ]
         /*ref.setValue(profile.local_tag, forKey: "local_tag")
         ref.setValue(profile.name, forKey: "name")
         ref.setValue(profile.bio, forKey: "bio")*/
         
-        if profile.clips?.count != 0 {
+        /*if profile.clips?.count != 0 {
             data["clips"] = profile.clips
             //ref.setValue(profile.clips, forKey: "clips")
         }
@@ -130,9 +148,12 @@ class Account {
             data["platforms"] = platforms
             //ref.setValue(platforms, forKey: "platforms")
         }
-        if profile.supporters?.count != 0 {
-            //ref.setValue(profile.supporters, forKey: "supporters")
+        if profile.picture != nil {
+            data["picture"] = profile.picture
         }
+        if profile.banner != nil {
+            data["banner"] = profile.banner
+        }*/
         
         Firestore.firestore().collection("users").document(id).setData(data, merge: true) { err in
             if let err = err {
@@ -143,5 +164,21 @@ class Account {
         }
 
         
+    }
+    
+    public static func savePicture(profile: Profile) {
+        let id = profile.id
+        print("attempting to save picture for id \(id)")
+        if profile.picture != nil {
+            Firestore.firestore().collection("users").document(id).setValue(profile.picture, forKey: "picture")
+        }
+    }
+    
+    public static func saveBanner(profile: Profile) {
+        let id = profile.id
+        
+        if profile.banner != nil {
+            Firestore.firestore().collection("users").document(id).setValue(profile.banner, forKey: "banner")
+        }
     }
 }

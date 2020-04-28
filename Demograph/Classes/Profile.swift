@@ -18,8 +18,10 @@ class Profile {
     var clips: [Int]?
     var id: String
     var bio: String?
+    var picture: UIImage?
+    var banner: UIImage?
     
-    init(id: String, local_tag:String, name:String, platforms:[Platform], bio:String, supporters:[String], clips:[Int]) {
+    init(id: String, local_tag:String, name:String, picture:UIImage, banner:UIImage, platforms:[Platform], bio:String, supporters:[String], clips:[Int]) {
         self.id = id
         self.local_tag = local_tag
         self.name = name
@@ -27,9 +29,11 @@ class Profile {
         self.supporters = supporters
         self.clips = clips
         self.bio = bio
+        self.picture = picture
+        self.banner = banner
     }
     
-    public static var current: Profile = Profile(id: "", local_tag: "", name: "", platforms: [], bio: "", supporters: [], clips: [])
+    public static var current: Profile = Profile(id: "", local_tag: "", name: "", picture: UIImage(), banner: UIImage(), platforms: [], bio: "", supporters: [], clips: [])
     
     public static func attemptLoadCurrent(completion: @escaping (_ success: Bool) -> Void) {
         if Auth.auth().currentUser != nil {

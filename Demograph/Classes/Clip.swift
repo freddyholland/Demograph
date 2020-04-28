@@ -20,8 +20,9 @@ class Clip {
     var id: Int
     var tags: [Tag]
     var votes: [Vote]?
+    var thumbnail: String
     
-    init(url:String, title:String, /*creator:Profile,*/ date:String, time:String, platform: Platforms, platformTag: String, id: Int, tags: [Tag], votes: [Vote]) {
+    init(url:String, title:String, /*creator:Profile,*/ date:String, time:String, platform: Platforms, platformTag: String, id: Int, thumbnail: String, tags: [Tag], votes: [Vote]) {
         self.url = url
         self.title = title
         //self.creator = creator
@@ -32,6 +33,7 @@ class Clip {
         self.id = id
         self.tags = tags
         self.votes = votes
+        self.thumbnail = thumbnail
     }
     
     func add(vote:Vote) {
@@ -59,13 +61,15 @@ class Clip {
         // MARK: - Save the clip to the database under 'ID'
         let id:String = "\(self.id)"
         let doc = Firestore.firestore().collection("clips").document(id)
-        var data: [String:Any] = ["title":self.title, "platform":self.platform.rawValue, "platform_tag":self.platformTag, "time":self.time, "date":self.date,"url":self.url]
+        var data: [String:Any] = ["title":self.title, "platform":self.platform.rawValue, "platform_tag":self.platformTag, "thumbnail":self.thumbnail, "time":self.time, "date":self.date,"url":self.url]
         if self.tags.count != 0 {
             var tag_strings: [String] = []
             for tag in self.tags {
                 tag_strings.append(tag.name)
             }
             data["tags"] = tag_strings
+        } else {
+            data["tags"] = []
         }
         if self.votes?.count != 0 {
             var votes: [[Any]] = []
@@ -73,7 +77,10 @@ class Clip {
                 votes.append(vote.toDB())
             }
             data["votes"] = votes
+        } else {
+            data["votes"] = []
         }
+        
         doc.setData(data)
     }
     
@@ -94,13 +101,14 @@ class Clip {
                 let url:String = snapshot?.get("url") as! String
                 let date:String = snapshot?.get("date") as! String
                 let time:String = snapshot?.get("time") as! String
+                let thumbnail:String = snapshot?.get("thumbnail") as! String
                 let platform_tag:String = snapshot?.get("platformTag") as! String
                 let platform:Platforms = Platforms(rawValue: snapshot?.get("platform") as! String)!
                 var tags:[Tag] = []
                 for tagString in snapshot?.get("tags") as! [String] {
                     tags.append(Tag(name: tagString))
                 }
-                completion(Clip(url: url, title: title, date: date, time: time, platform: platform, platformTag: platform_tag, id: from, tags: tags, votes: []))
+                completion(Clip(url: url, title: title, date: date, time: time, platform: platform, platformTag: platform_tag, id: from, thumbnail: thumbnail, tags: tags, votes: []))
                 
                 /*if snapshot?.get("votes") != nil {
                     let votes = snapshot?.get("votes")
