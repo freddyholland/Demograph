@@ -16,14 +16,17 @@ class ImagePickerController: UIViewController, ImagePickerDelegate {
         case 1:
             // Change profile picture.
             let profile = Profile.current
+            print("### Supposed ID: " + profile.id)
             profile.picture = image
             print("ID'd as case 1 - modification successful, attempting to save profile")
-            Account.savePicture(profile: profile)
+            Bucket.saveUserPicture(profile: profile)
         case 2:
             // Change banner picture.
             let profile = Profile.current
+            print("Attempting to save banner to " + profile.id)
             profile.banner = image
-            Account.saveBanner(profile: profile)
+            print("ID'd as case 2 - modification successful, attempting to save profile")
+            Bucket.saveUserBanner(profile: profile)
         default:
             print("No value")
         }

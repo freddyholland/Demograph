@@ -20,17 +20,17 @@ open class ImagePicker: NSObject {
 
     public init(presentationController: UIViewController, delegate: ImagePickerDelegate) {
         self.pickerController = UIImagePickerController()
-
+        
         super.init()
-
+        
         self.presentationController = presentationController
         self.delegate = delegate
         
         self.pickerController.delegate = self
-        self.pickerController.allowsEditing = false
+        self.pickerController.allowsEditing = true
         self.pickerController.mediaTypes = ["public.image"]
     }
-
+    
     private func action(for type: UIImagePickerController.SourceType, title: String) -> UIAlertAction? {
         guard UIImagePickerController.isSourceTypeAvailable(type) else {
             return nil
@@ -43,9 +43,9 @@ open class ImagePicker: NSObject {
     }
 
     public func present(from sourceView: UIView) {
-
+        
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-
+        
         if let action = self.action(for: .camera, title: "Take Photo") {
             alertController.addAction(action)
         }
@@ -82,7 +82,7 @@ extension ImagePicker: UIImagePickerControllerDelegate {
 
     public func imagePickerController(_ picker: UIImagePickerController,
                                       didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        guard let image = info[.originalImage] as? UIImage else {
+        guard let image = info[.editedImage] as? UIImage else {
             return self.pickerController(picker, didSelect: nil)
         }
         self.pickerController(picker, didSelect: image)

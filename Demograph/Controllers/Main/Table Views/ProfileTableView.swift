@@ -53,13 +53,35 @@ class ProfileTableView: UIViewController, UITableViewDataSource, UITableViewDele
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadAllContent()
         
-        //self.platformTableView.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 49, right: 0.0)
-
         platformTableView.delegate = self
         platformTableView.dataSource = self
-        // Do any additional setup after loading the view.
+        
+        if Profile.current.id.isEmpty {
+            print("Current ID is empty")
+            Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true, block: {
+                timer in
+                print("checking if value changed")
+                if !Profile.current.id.isEmpty {
+                    print("value changed!")
+                    self.userAccount = Profile.current
+                    self.reloadData()
+                    timer.invalidate()
+                }
+            })
+        } else {
+            print("Data is loaded: reloading controller")
+            reloadData()
+        }
+        
+        
+        /*repeat {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+                print("testing if ID is empty")
+                self.userAccount = Profile.current
+                self.reloadData()
+            })
+        } while Profile.current.id.isEmpty*/
         
     }
     
@@ -71,19 +93,28 @@ class ProfileTableView: UIViewController, UITableViewDataSource, UITableViewDele
         print("Reloading all content on profile.")
         Profile.attemptLoadCurrent(completion: {
             success in
+            print("Attempting to load current")
             if success {
+                print("great success")
                 self.userAccount = Profile.current
                 
-                self.userTag.text = self.userAccount.local_tag
-                self.userFullname.text = self.userAccount.name
-                self.userBio.text = self.userAccount.bio
+                self.reloadData()
                 
-                self.platformTableView.reloadData()
                 print("### Loaded all profile data. \(Profile.current.local_tag)")
             } else {
                 print("### An error occurred retrieving profile information")
             }
         })
         
+    }
+    
+    func reloadData() {
+        self.userTag.text = self.userAccount.local_tag
+        self.userFullname.text = self.userAccount.name
+        self.userBio.text = self.userAccount.bio
+        self.userPicture.image = self.userAccount.picture
+        self.userBanner.image = self.userAccount.banner
+        
+        self.platformTableView.reloadData()
     }
 }

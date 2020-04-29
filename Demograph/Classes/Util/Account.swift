@@ -24,7 +24,9 @@ class Account {
             
             let profile = Profile(id: user.uid, local_tag: local_tag.lowercased(), name: name, picture: Placeholders.picture!, banner: Placeholders.banner!, platforms: [], bio: "", supporters: [], clips: [])
             saveProfile(profile: profile)
-            Firestore.firestore().collection("users").document(user.uid).setValue(email, forKey: "email")
+            let emailData = ["email":email]
+            Firestore.firestore().collection("users").document(user.uid).setData(emailData, merge: true)
+            //Firestore.firestore().collection("users").document(user.uid).setValue(email, forKey: "email")
             completionHandler(true, error)
         })
     }
@@ -71,33 +73,29 @@ class Account {
     public static func getProfile(userID: String, completion: @escaping (_ user: Profile) -> Void) {
         let profile = Profile(id: userID, local_tag: "", name: "", picture: UIImage(), banner: UIImage(), platforms: [], bio: "", supporters: [], clips: [])
         
+        print("attempting to get profile")
         Firestore.firestore().collection("users").document(userID).getDocument(completion: {
             (snapshot, error) in
             
             if let error = error {
                 print(error)
+                print("there was an aerror")
                 return
             }
             
+            print("checking for local_tag")
             if (snapshot?.get("local_tag") != nil)
                 && (snapshot?.get("name") != nil)
                 && (snapshot?.get("email") != nil) {
                 
                 // All necessary fields are available.
+                print("Stage 1 pass")
                 
                 profile.local_tag = snapshot?.get("local_tag") as! String
                 profile.name = snapshot?.get("name") as! String
                 
                 if snapshot?.get("bio") != nil {
                     profile.bio = snapshot?.get("bio") as? String
-                }
-                
-                if snapshot?.get("picture") != nil {
-                    profile.picture = snapshot?.get("picture") as? UIImage
-                }
-                
-                if snapshot?.get("banner") != nil {
-                    profile.banner = snapshot?.get("banner") as? UIImage
                 }
                 
                 if snapshot?.get("platforms") != nil {
@@ -108,16 +106,30 @@ class Account {
                     }
                 }
                 
-                if snapshot?.get("supporters") != nil {
-                    print("Supporters yet to be implemented")
-                    // MARK:- Implement support for supporters function.
-                }
+                Bucket.getUserPicture(id: userID, completion: {
+                    image in
+                    profile.picture = image
+                    print("Picture image loaded")
+                    Bucket.getUserBanner(id: userID, completion: {
+                        image in
+                        profile.banner = image
+                        print("Banner image loaded")
+                        
+                        completion(profile)
+                        print("Profile returned in completion handler")
+                    })
+                })
                 
-                completion(profile)
                 print("### \(profile.local_tag), \(profile.name), \(profile.id)")
             }
             
         })
+        
+        
+        
+        
+        
+        
     }
     
     public static func saveProfile(profile: Profile) {
@@ -128,9 +140,7 @@ class Account {
             "name":profile.name,
             "bio":profile.bio!,
             "clips":profile.clips!,
-            "platforms":profile.platforms!,
-            "picture":profile.picture?.pngData()!,
-            "banner":profile.banner!
+            "platforms":profile.platforms!
         ]
         /*ref.setValue(profile.local_tag, forKey: "local_tag")
         ref.setValue(profile.name, forKey: "name")
@@ -162,23 +172,10 @@ class Account {
                 print("### Document successfully written!")
             }
         }
+        
+        Bucket.saveUserPicture(profile: profile)
+        Bucket.saveUserBanner(profile: profile)
 
         
-    }
-    
-    public static func savePicture(profile: Profile) {
-        let id = profile.id
-        print("attempting to save picture for id \(id)")
-        if profile.picture != nil {
-            Firestore.firestore().collection("users").document(id).setValue(profile.picture, forKey: "picture")
-        }
-    }
-    
-    public static func saveBanner(profile: Profile) {
-        let id = profile.id
-        
-        if profile.banner != nil {
-            Firestore.firestore().collection("users").document(id).setValue(profile.banner, forKey: "banner")
-        }
     }
 }

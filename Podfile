@@ -9,6 +9,7 @@ target 'Demograph' do
 
   pod 'Firebase/Analytics'
   pod 'Firebase/Auth'
+  pod 'Firebase/Storage'
   pod 'Firebase/Firestore'
   pod 'Alamofire', '~> 5.1' 
 

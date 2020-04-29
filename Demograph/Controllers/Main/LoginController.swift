@@ -62,6 +62,15 @@ class LoginController: UIViewController, UITextFieldDelegate {
     func segueToMainView() {
         let mainView = storyboard?.instantiateViewController(withIdentifier: "mainTabController") as! UITabBarController
         mainView.modalPresentationStyle = .fullScreen
+        
+        Profile.attemptLoadCurrent(completion: {
+            success in
+            
+            if success {
+                print("Successfully loaded current controller.")
+            }
+        })
+        
         self.present(mainView, animated: true, completion: {
             
             self.emailField.text = ""

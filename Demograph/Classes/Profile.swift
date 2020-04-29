@@ -36,17 +36,23 @@ class Profile {
     public static var current: Profile = Profile(id: "", local_tag: "", name: "", picture: UIImage(), banner: UIImage(), platforms: [], bio: "", supporters: [], clips: [])
     
     public static func attemptLoadCurrent(completion: @escaping (_ success: Bool) -> Void) {
+        print("function called in class")
+        print(Auth.auth().currentUser!.uid)
         if Auth.auth().currentUser != nil {
+            print("current user DOESNT = nil")
             Account.getProfile(userID: Auth.auth().currentUser!.uid, completion: {
                 profile in
                 current = profile
+                print("completion = true")
                 completion(true)
             })
         } else {
+            print("an error occured!!! completion = false")
             completion(false)
         }
     }
     
+    // Call when modiciations are made.
     public static func attemptSaveCurrent(completion: (_ success: Bool) -> Void) {
         print("### Attempting to save current Profile with UID \(current.id)")
         Account.saveProfile(profile: current)
