@@ -98,7 +98,12 @@ class SettingsTableView: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // The row at indexPath has been pressed.
-        let row = indexPath.row
+        var row = indexPath.row
+        if indexPath.section == 1 {
+            row += 5
+        }
+        
+        print("selected row \(row)")
         
         if row == 0 {
             // MARK:- USERNAME
@@ -212,6 +217,8 @@ class SettingsTableView: UITableViewController {
             self.present(imageController, animated: true, completion: nil)
         } else if row == 5 {
             // MARK:- MANAGE PLATFORMS
+            let platformManager = self.storyboard?.instantiateViewController(withIdentifier: "addPlatformController") as! AddPlatformController
+            self.present(platformManager, animated: true, completion: nil)
         } else if row == 6 {
             // MARK:- MANAGE ADS
         }

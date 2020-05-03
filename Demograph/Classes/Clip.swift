@@ -19,10 +19,9 @@ class Clip {
     var platformTag: String
     var id: Int
     var tags: [Tag]
-    var votes: [Vote]?
     var thumbnail: String
     
-    init(url:String, title:String, /*creator:Profile,*/ date:String, time:String, platform: Platforms, platformTag: String, id: Int, thumbnail: String, tags: [Tag], votes: [Vote]) {
+    init(url:String, title:String, /*creator:Profile,*/ date:String, time:String, platform: Platforms, platformTag: String, id: Int, thumbnail: String, tags: [Tag]) {
         self.url = url
         self.title = title
         //self.creator = creator
@@ -32,29 +31,7 @@ class Clip {
         self.platformTag = platformTag
         self.id = id
         self.tags = tags
-        self.votes = votes
         self.thumbnail = thumbnail
-    }
-    
-    func add(vote:Vote) {
-        votes?.append(vote)
-    }
-    
-    func getScore() -> Int {
-        if(votes != nil && votes?.count != 0) {
-            var score = 0
-            for vote in votes! {
-                if vote.plus {
-                    score += 1
-                } else {
-                    score -= 1
-                }
-            }
-            
-            return score
-        } else {
-            return 0
-        }
     }
     
     func save() {
@@ -71,17 +48,54 @@ class Clip {
         } else {
             data["tags"] = []
         }
-        if self.votes?.count != 0 {
-            var votes: [[Any]] = []
-            for vote in self.votes! {
-                votes.append(vote.toDB())
-            }
-            data["votes"] = votes
-        } else {
-            data["votes"] = []
-        }
         
         doc.setData(data)
+    }
+    
+    public static func getClip(from: [String:Any]) -> Clip {
+        let clip = Clip(
+            url: from["url"] as! String,
+            title: from["title"] as! String,
+            date: from["date"] as! String,
+            time: from["time"] as! String,
+            platform: Platforms.init(rawValue: from["platform"] as! String)!,
+            platformTag: from["platformTag"] as! String,
+            id: from["id"] as! Int,
+            thumbnail: from["thumbnail"] as! String,
+            tags: [])
+        
+        let stringTags: [String] = from["tags"] as! [String]
+        var tags: [Tag] = []
+        for tagString in stringTags {
+            tags.append(Tag(name: tagString))
+        }
+        clip.tags = tags
+        
+        return clip
+        
+    }
+    
+    public static func getDictionary(from: Clip) -> [String:Any] {
+        var array: [String:Any] = [:]
+        array["url"] = from.url
+        array["title"] = from.title
+        array["date"] = from.date
+        array["time"] = from.time
+        array["platform"] = from.platform.rawValue
+        array["platformTag"] = from.platformTag
+        array["id"] = from.id
+        array["thumbnail"] = from.thumbnail
+        if from.tags.count != 0 {
+            var stringTags: [String] = []
+            for tag in from.tags {
+                stringTags.append(tag.name)
+            }
+            array["tags"] = stringTags
+        } else {
+            array["tags"] = []
+        }
+        
+        return array
     }
     
     public static func getClip(from: Int, completion: @escaping (_ clip: Clip) -> Void) {
@@ -108,7 +122,7 @@ class Clip {
                 for tagString in snapshot?.get("tags") as! [String] {
                     tags.append(Tag(name: tagString))
                 }
-                completion(Clip(url: url, title: title, date: date, time: time, platform: platform, platformTag: platform_tag, id: from, thumbnail: thumbnail, tags: tags, votes: []))
+                completion(Clip(url: url, title: title, date: date, time: time, platform: platform, platformTag: platform_tag, id: from, thumbnail: thumbnail, tags: tags))
                 
                 /*if snapshot?.get("votes") != nil {
                     let votes = snapshot?.get("votes")
@@ -117,26 +131,39 @@ class Clip {
         })
     }
     
-    public static func loadClips(range: Int, completion: (_ loaded: [Clip]) -> Void) {
-        for _ in 0...range {
-            // Retrieve most recent list.
-            // Access indexes 0 to range in recent list.
-            // Return this list.
-            // MARK: - Work in progress.
-        }
+    public static func loadClips(range: Int, completion: @escaping (_ loaded: [Clip]) -> Void) {
         
-        //return Placeholders.userAccount.clips
+        print("attempting to download clips")
+        var clips: [Clip] = []
+        for id in 0...range {
+            print("downloading \(id)")
+            getClip(from: id, completion:
+                { clip in
+                
+                    print("\(id) downloaded")
+                    print(clip.url)
+                clips.append(clip)
+                    print("\(clips.count) / \(range)")
+                if clips.count == range {
+                    completion(clips)
+                }
+            })
+        }
     }
     
-    public static func loadClips(range: [Int], completion: (_ loaded: [Clip]) -> Void) {
-        for _ in range {
-            // Get clip with ID index.
-            // Compile a list of [Clip].
-            // Return this list.
-            // MARK: - Work in progress.
-        }
+    public static func loadClips(range: [Int], completion: @escaping (_ loaded: [Clip]) -> Void) {
         
-        //return Placeholders.userAccount.clips
+        var clips: [Clip] = []
+        for id in range {
+            getClip(from: id, completion:
+                { clip in
+                
+                clips.append(clip)
+                if clips.count == range.count {
+                    completion(clips)
+                }
+            })
+        }
     }
     
     /*public static func loadHotClips(range: Int) -> [Clip] {
@@ -165,6 +192,14 @@ class Clip {
         }
         
         return returningList
+    }
+    
+    public static func generateID() -> Int
+    {
+        // Random integer between 0 - 9999999 to use as ID.
+        // System will be improved upon upgrading DB.
+        let int = Int(arc4random_uniform(9999999))
+        return int
     }
     
     /*public static func identifyClips(with: [Tag]) -> [(key:Int,value:Int)] {

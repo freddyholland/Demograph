@@ -9,6 +9,7 @@
 import Foundation
 
 class Platform {
+    
     var type: Platforms
     var userTag: String
     var userName: String
@@ -21,15 +22,16 @@ class Platform {
         //self.userInfo = userInfo
     }
     
-    public static func getPlatform(from:[String]) -> Platform {
-        return Platform(type: Platforms(rawValue: from[0])!, userTag: from[1], userName: from[2])
+    public static func getPlatform(from:[String:String]) -> Platform {
+        return Platform(type: Platforms(rawValue: from["type"]!)!, userTag: from["userTag"]!, userName: from["userName"]!)
     }
     
-    public static func getArray(from:Platform) -> [String] {
-        var array: [String] = []
-        array.append(from.type.rawValue)
-        array.append(from.userTag)
-        array.append(from.userName)
+    public static func getDictionary(from:Platform) -> [String:String] {
+        var array: [String:String] = [:]
+        array["type"] = from.type.rawValue
+        array["userTag"] = from.userTag
+        array["userName"] = from.userName
+        
         return array
     }
     
@@ -65,7 +67,7 @@ class Platform {
     }
 }
 
-enum Platforms : String {
+enum Platforms : String, CaseIterable {
     
     case Youtube // Thumbnail download & content accessible. X
     case Instagram // Content accessible & square thumbnail available. X

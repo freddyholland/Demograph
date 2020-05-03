@@ -15,17 +15,19 @@ class ExploreTableView: UITableViewController {
     @IBOutlet weak var supportingButton: UIButton!
     var selected_button:UIButton = UIButton()
     
-    var clipsToLoad = [1]
+    //var clipsToLoad = [1]
     var loadedClips: [Clip] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setSelectedButton(b: newButton)
-        Clip.loadClips(range: clipsToLoad, completion: {
+        print("loading clips")
+        Clip.loadClips(range: 5, completion: {
             (loaded) in
-            loadedClips = loaded
-            tableView.reloadData()
+            print("clips are loaded")
+            self.loadedClips = loaded
+            self.tableView.reloadData()
         })
     }
 
@@ -80,11 +82,8 @@ class ExploreTableView: UITableViewController {
             
             cell.tagLabel.text = "@" + clip.platformTag
             
-            // https://www.instagram.com/p/B-dZbWpA23l/
-            // Remove the URL to find the video's ID
-            let videoId = clip.url.replacingOccurrences(of: "https://www.instagram.com/p/", with: "").replacingOccurrences(of: "/", with: "")
             // Create the video thumbnail url with the ID
-            let videoThumbnailUrlString = "https://www.instagram.com/p/\(videoId)/media/?size=m"
+            let videoThumbnailUrlString = clip.thumbnail
             // Create URL from string
             let videoThumbnailUrl = URL(string: videoThumbnailUrlString)
             
@@ -213,6 +212,7 @@ class ExploreTableView: UITableViewController {
     
     @IBAction func newButtonPress(_ sender: Any) {
         setSelectedButton(b: newButton)
+        print(Clip.generateID())
     }
     @IBAction func hotButtonPress(_ sender: Any) {
         setSelectedButton(b: hotButton)

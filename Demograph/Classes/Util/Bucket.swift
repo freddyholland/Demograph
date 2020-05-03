@@ -19,6 +19,7 @@ class Bucket {
         print("### ID = \(id)")
         let userPictureRef = storage.child("users/pictures/\(profile.id).jpg")
         
+        print("attempting to save users picture")
         // Upload the file to the path "images/rivers.jpg"
         userPictureRef.putData((profile.picture?.jpegData(compressionQuality: 0.25))!, metadata: nil) { (metadata, error) in
             if let error = error {
@@ -30,7 +31,9 @@ class Bucket {
     public static func saveUserBanner(profile: Profile) {
         let userPictureRef = storage.child("users/banners/\(profile.id).jpg")
         
-        userPictureRef.putData((profile.picture?.jpegData(compressionQuality: 0.25))!, metadata: nil, completion: {
+        print("attempting to save users banner")
+        
+        userPictureRef.putData((profile.banner?.jpegData(compressionQuality: 0.25))!, metadata: nil, completion: {
             (metadata, error) in
             if let error = error {
                 print(error)

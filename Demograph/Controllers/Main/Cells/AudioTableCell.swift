@@ -16,7 +16,7 @@ class AudioTableCell: UITableViewCell {
     @IBOutlet weak var tagLabel: UILabel!
     
     
-    var clip: Clip = Clip(url: "", title: "", date: "", time: "", platform: Platforms.Email, platformTag: "", id: 0, thumbnail: "", tags: [], votes: [])
+    var clip: Clip = Clip(url: "", title: "", date: "", time: "", platform: Platforms.Email, platformTag: "", id: 0, thumbnail: "", tags: [])
     
     var controller: ExploreTableView!
     var height: CGFloat = 0

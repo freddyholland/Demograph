@@ -18,6 +18,7 @@ class Placeholders {
         banner: UIImage(),
         platforms: [],
         bio: "",
+        supporting: [],
         supporters: [],
         clips: [1])
     // Clip(url: "https://www.youtube.com/watch?v=tlvbnqVXgok", title: "THE SCOTTS, Travis Scott, Kid Cudi - THE SCOTTS (Inside)", date: "", time: "", platform: Platforms.Youtube, platformTag: "Travis Scott", id: 0, tags: [], votes: [])

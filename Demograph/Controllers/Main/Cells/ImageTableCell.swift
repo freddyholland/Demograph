@@ -19,7 +19,7 @@ class ImageTableCell: UITableViewCell {
     var controller: ExploreTableView!
     var height: CGFloat = 0
     var link: String!
-    var clip: Clip = Clip(url: "", title: "", date: "", time: "", platform: Platforms.Email, platformTag: "", id: 0, thumbnail: "", tags: [], votes:[])
+    var clip: Clip = Clip(url: "", title: "", date: "", time: "", platform: Platforms.Email, platformTag: "", id: 0, thumbnail: "", tags: [])
     
     override func awakeFromNib() {
         super.awakeFromNib()

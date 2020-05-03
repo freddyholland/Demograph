@@ -11,6 +11,10 @@
 		88272D5A2457BE7200B2DFE6 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88272D592457BE7200B2DFE6 /* API.swift */; };
 		88272D5C2457BFC400B2DFE6 /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88272D5B2457BFC400B2DFE6 /* SwiftyJSON.swift */; };
 		88282D2424593A2C0066DB65 /* AddPlatformController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88282D2324593A2C0066DB65 /* AddPlatformController.swift */; };
+		88602095245993B2005E0703 /* TagSearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88602094245993B2005E0703 /* TagSearchController.swift */; };
+		8860209724599489005E0703 /* TagCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8860209624599489005E0703 /* TagCell.swift */; };
+		8876E6DF245E9CD300C1505B /* Preference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8876E6DE245E9CD300C1505B /* Preference.swift */; };
+		8886CBDB245D384E00161D6E /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8886CBDA245D384E00161D6E /* Error.swift */; };
 		88CA1F3624585E8300632B63 /* Bucket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CA1F3524585E8300632B63 /* Bucket.swift */; };
 		B512DECB2430320A007D34A0 /* VideoTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B512DECA2430320A007D34A0 /* VideoTableCell.swift */; };
 		B5139BDB24567DF40088565A /* ImagePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5139BDA24567DF40088565A /* ImagePickerController.swift */; };
@@ -50,6 +54,10 @@
 		88272D592457BE7200B2DFE6 /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
 		88272D5B2457BFC400B2DFE6 /* SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyJSON.swift; sourceTree = "<group>"; };
 		88282D2324593A2C0066DB65 /* AddPlatformController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlatformController.swift; sourceTree = "<group>"; };
+		88602094245993B2005E0703 /* TagSearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagSearchController.swift; sourceTree = "<group>"; };
+		8860209624599489005E0703 /* TagCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagCell.swift; sourceTree = "<group>"; };
+		8876E6DE245E9CD300C1505B /* Preference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preference.swift; sourceTree = "<group>"; };
+		8886CBDA245D384E00161D6E /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		88CA1F3524585E8300632B63 /* Bucket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bucket.swift; sourceTree = "<group>"; };
 		B512DECA2430320A007D34A0 /* VideoTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoTableCell.swift; sourceTree = "<group>"; };
 		B5139BDA24567DF40088565A /* ImagePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerController.swift; sourceTree = "<group>"; };
@@ -115,23 +123,13 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		88282D2524593A340066DB65 /* Table Views */ = {
-			isa = PBXGroup;
-			children = (
-				B5E8B9D1243313DF00723F15 /* Cells */,
-				B56DA7D5242CD07C0089497C /* ExploreTableView.swift */,
-				B5E8B9CA2432F23700723F15 /* ProfileTableView.swift */,
-				B5E2DB8F24552D00005EC889 /* SettingsTableView.swift */,
-			);
-			path = "Table Views";
-			sourceTree = "<group>";
-		};
 		88282D2624593A510066DB65 /* Pop ups */ = {
 			isa = PBXGroup;
 			children = (
 				B5139BDA24567DF40088565A /* ImagePickerController.swift */,
 				B5E8B9DB2434467700723F15 /* VideoWebController.swift */,
 				88282D2324593A2C0066DB65 /* AddPlatformController.swift */,
+				88602094245993B2005E0703 /* TagSearchController.swift */,
 			);
 			path = "Pop ups";
 			sourceTree = "<group>";
@@ -139,10 +137,13 @@
 		88282D2724593A810066DB65 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				B5E8B9D1243313DF00723F15 /* Cells */,
 				B5EBB1662452E54500803CEA /* PublishController.swift */,
 				B5E8B9DD24346A8900723F15 /* LoginController.swift */,
 				B5E8B9DF24346AA700723F15 /* SignupController.swift */,
-				88282D2524593A340066DB65 /* Table Views */,
+				B56DA7D5242CD07C0089497C /* ExploreTableView.swift */,
+				B5E8B9CA2432F23700723F15 /* ProfileTableView.swift */,
+				B5E2DB8F24552D00005EC889 /* SettingsTableView.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -154,6 +155,8 @@
 				B5E2DB972455B363005EC889 /* ImagePicker.swift */,
 				88272D592457BE7200B2DFE6 /* API.swift */,
 				88CA1F3524585E8300632B63 /* Bucket.swift */,
+				8886CBDA245D384E00161D6E /* Error.swift */,
+				8876E6DE245E9CD300C1505B /* Preference.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -195,8 +198,8 @@
 		B5E8B9D0243313D100723F15 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				88282D2724593A810066DB65 /* Main */,
 				88282D2624593A510066DB65 /* Pop ups */,
+				88282D2724593A810066DB65 /* Main */,
 				88272D572456EC5C00B2DFE6 /* TabBarController.swift */,
 			);
 			path = Controllers;
@@ -210,6 +213,7 @@
 				B5E41F1D2438165500504EA3 /* ImageTableCell.swift */,
 				B5E41F1F2438166300504EA3 /* AudioTableCell.swift */,
 				B5E2DB912455637C005EC889 /* SettingsTableCell.swift */,
+				8860209624599489005E0703 /* TagCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -348,12 +352,14 @@
 				B5E8B9DE24346A8900723F15 /* LoginController.swift in Sources */,
 				B5E8B9DC2434467700723F15 /* VideoWebController.swift in Sources */,
 				B5E2DB982455B363005EC889 /* ImagePicker.swift in Sources */,
+				8876E6DF245E9CD300C1505B /* Preference.swift in Sources */,
 				B5E8B9CB2432F23700723F15 /* ProfileTableView.swift in Sources */,
 				88CA1F3624585E8300632B63 /* Bucket.swift in Sources */,
 				88272D582456EC5C00B2DFE6 /* TabBarController.swift in Sources */,
 				B5E8B9E024346AA700723F15 /* SignupController.swift in Sources */,
 				B5E8B9D824341F9C00723F15 /* Profile.swift in Sources */,
 				B5E41F202438166300504EA3 /* AudioTableCell.swift in Sources */,
+				88602095245993B2005E0703 /* TagSearchController.swift in Sources */,
 				B5E2DB922455637D005EC889 /* SettingsTableCell.swift in Sources */,
 				B5E41F1E2438165500504EA3 /* ImageTableCell.swift in Sources */,
 				B5E8B9D624341EEC00723F15 /* Clip.swift in Sources */,
@@ -364,12 +370,14 @@
 				B5E8B9DA2434200800723F15 /* Placeholders.swift in Sources */,
 				B5E2DB9024552D00005EC889 /* SettingsTableView.swift in Sources */,
 				88272D5C2457BFC400B2DFE6 /* SwiftyJSON.swift in Sources */,
+				8860209724599489005E0703 /* TagCell.swift in Sources */,
 				B5139BDB24567DF40088565A /* ImagePickerController.swift in Sources */,
 				B56DA7D6242CD07C0089497C /* ExploreTableView.swift in Sources */,
 				B5E8B9CF24330B4D00723F15 /* Platform.swift in Sources */,
 				B5E8B9CD2432F43100723F15 /* PlatformTableCell.swift in Sources */,
 				88272D5A2457BE7200B2DFE6 /* API.swift in Sources */,
 				B5D588C0245323AF0015922D /* Account.swift in Sources */,
+				8886CBDB245D384E00161D6E /* Error.swift in Sources */,
 				88282D2424593A2C0066DB65 /* AddPlatformController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

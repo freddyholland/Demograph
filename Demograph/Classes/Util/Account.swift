@@ -22,8 +22,16 @@ class Account {
                 return
             }
             
-            let profile = Profile(id: user.uid, local_tag: local_tag.lowercased(), name: name, picture: Placeholders.picture!, banner: Placeholders.banner!, platforms: [], bio: "", supporters: [], clips: [])
-            saveProfile(profile: profile)
+            let profile = Profile(id: user.uid, local_tag: local_tag.lowercased(), name: name, picture: Placeholders.picture!, banner: Placeholders.banner!, platforms: [], bio: "", supporting: [], supporters: [], clips: [])
+            saveProfile(profile: profile, completion: {
+                success in
+                
+                if success {
+                    print("account successfully created")
+                } else {
+                    completionHandler(false, error)
+                }
+            })
             let emailData = ["email":email]
             Firestore.firestore().collection("users").document(user.uid).setData(emailData, merge: true)
             //Firestore.firestore().collection("users").document(user.uid).setValue(email, forKey: "email")
@@ -71,7 +79,7 @@ class Account {
     }
     
     public static func getProfile(userID: String, completion: @escaping (_ user: Profile) -> Void) {
-        let profile = Profile(id: userID, local_tag: "", name: "", picture: UIImage(), banner: UIImage(), platforms: [], bio: "", supporters: [], clips: [])
+        let profile = Profile(id: userID, local_tag: "", name: "", picture: UIImage(), banner: UIImage(), platforms: [], bio: "", supporting: [], supporters: [], clips: [])
         
         print("attempting to get profile")
         Firestore.firestore().collection("users").document(userID).getDocument(completion: {
@@ -99,11 +107,13 @@ class Account {
                 }
                 
                 if snapshot?.get("platforms") != nil {
-                    let platformArrays = snapshot?.get("platforms") as! [[String]]
+                    print("grabbing items from /platforms")
+                    let platformArrays = snapshot?.get("platforms") as! [[String:String]]
                     var platforms:[Platform] = []
                     for platformArray in platformArrays {
                         platforms.append(Platform.getPlatform(from: platformArray))
                     }
+                    profile.platforms = platforms
                 }
                 
                 Bucket.getUserPicture(id: userID, completion: {
@@ -132,44 +142,40 @@ class Account {
         
     }
     
-    public static func saveProfile(profile: Profile) {
+    public static func saveProfile(profile: Profile, completion: @escaping (_ success: Bool) -> Void) {
         print("### Recieved request to save Profile")
         let id = profile.id
-        let data: [String:Any] = [
+        var data: [String:Any] = [
             "local_tag":profile.local_tag.lowercased(),
             "name":profile.name,
             "bio":profile.bio!,
-            "clips":profile.clips!,
-            "platforms":profile.platforms!
+            "clips":profile.clips!
         ]
-        /*ref.setValue(profile.local_tag, forKey: "local_tag")
-        ref.setValue(profile.name, forKey: "name")
-        ref.setValue(profile.bio, forKey: "bio")*/
+        
+        print(profile.id)
         
         /*if profile.clips?.count != 0 {
             data["clips"] = profile.clips
             //ref.setValue(profile.clips, forKey: "clips")
-        }
-        if profile.platforms?.count != nil {
-            var platforms:[[String]] = []
+        }*/
+        if profile.platforms?.count != 0 {
+            var platforms:[[String:String]] = []
             for platform in profile.platforms! {
-                platforms.append(Platform.getArray(from: platform))
+                platforms.append(Platform.getDictionary(from: platform))
             }
             data["platforms"] = platforms
             //ref.setValue(platforms, forKey: "platforms")
+        } else {
+            data["platforms"] = []
         }
-        if profile.picture != nil {
-            data["picture"] = profile.picture
-        }
-        if profile.banner != nil {
-            data["banner"] = profile.banner
-        }*/
         
         Firestore.firestore().collection("users").document(id).setData(data, merge: true) { err in
             if let err = err {
                 print("### Error writing document: \(err)")
+                completion(false)
             } else {
                 print("### Document successfully written!")
+                completion(true)
             }
         }
         
