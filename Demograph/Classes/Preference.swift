@@ -69,4 +69,57 @@ class Preference {
         
         
     }
+    
+    public static func supportingClips(profile: Profile, completion: @escaping (_ clips: [Int]) -> Void) {
+        
+        let supporting = profile.supporting
+        var count = 0
+        if supporting?.count != 0
+        {
+            var mediaIDs: [Int] = []
+            for prof in supporting!
+            {
+                Account.getProfileUID(tag: prof)
+                { (profID) in
+                    
+                    // Get all 'profID' media.
+                    Account.getProfile(userID: profID, completion:
+                        { (userProfile) in
+                            
+                        if userProfile.clips?.count != nil
+                        {
+                            mediaIDs.append(contentsOf: userProfile.clips!)
+                        }
+                        count += 1
+                        if count == supporting?.count {
+                            completion(mediaIDs)
+                        }
+                            
+                    })
+                }
+            }
+            
+        } else {
+            completion([])
+        }
+        
+        // Convert STRING to UID
+        // From UID grab clip IDS
+        // Return clip IDS
+    }
+    
+    public static func orderByDate(relevantClips: [Clip]) -> [(key:Int,value:Double)] {
+        
+        var unorderedList: [Int:Double] = [:]
+        
+        for clip in relevantClips
+        {
+            let publishedDate = clip.date
+            let timeSincePublish = DGTime.timeFrom(date: publishedDate)
+            unorderedList[clip.id] = timeSincePublish
+        }
+        
+        let orderedList = unorderedList.sorted { $0.1 < $1.1 }
+        return orderedList
+    }
 }
