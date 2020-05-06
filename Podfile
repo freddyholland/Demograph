@@ -12,5 +12,6 @@ target 'Demograph' do
   pod 'Firebase/Storage'
   pod 'Firebase/Firestore'
   pod 'Alamofire', '~> 5.1' 
+  pod 'EzPopup'
 
 end

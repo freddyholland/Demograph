@@ -12,21 +12,19 @@ import FirebaseFirestore
 class Clip {
     var url: String
     var title: String
-    //var creator: Platform
+    var publisher: String
     var date: String
-    var time: String
     var platform: Platforms
     var platformTag: String
     var id: Int
     var tags: [Tag]
     var thumbnail: String
     
-    init(url:String, title:String, /*creator:Profile,*/ date:String, time:String, platform: Platforms, platformTag: String, id: Int, thumbnail: String, tags: [Tag]) {
+    init(url:String, title:String, publisher: String, date:String, platform: Platforms, platformTag: String, id: Int, thumbnail: String, tags: [Tag]) {
         self.url = url
         self.title = title
-        //self.creator = creator
+        self.publisher = publisher
         self.date = date
-        self.time = time
         self.platform = platform
         self.platformTag = platformTag
         self.id = id
@@ -38,7 +36,7 @@ class Clip {
         // MARK: - Save the clip to the database under 'ID'
         let id:String = "\(self.id)"
         let doc = Firestore.firestore().collection("clips").document(id)
-        var data: [String:Any] = ["title":self.title, "platform":self.platform.rawValue, "platform_tag":self.platformTag, "thumbnail":self.thumbnail, "time":self.time, "date":self.date,"url":self.url]
+        var data: [String:Any] = ["id":self.id, "title":self.title, "publisher": self.publisher, "platform":self.platform.rawValue, "platform_tag":self.platformTag, "thumbnail":self.thumbnail, "date":self.date,"url":self.url]
         if self.tags.count != 0 {
             var tag_strings: [String] = []
             for tag in self.tags {
@@ -50,16 +48,33 @@ class Clip {
         }
         
         doc.setData(data)
+        
+        Firestore.firestore().collection("users").document(self.publisher).getDocument
+        { (snapshot, err) in
+            if let err = err {
+                print(err)
+                return
+            }
+            
+            var clips: [Int] = snapshot?.get("clips") as! [Int]
+            print("$$ saving clips to database: gathered pre-existing clips.")
+            if clips.count != 0 {
+                print("$$ there are pre-existing clips: \(clips). adding \(self.id) to the array.")
+                clips.append(self.id)
+                Firestore.firestore().collection("users").document(self.publisher).setData(["clips":clips], merge: true)
+            }
+            
+        }
     }
     
     public static func getClip(from: [String:Any]) -> Clip {
         let clip = Clip(
             url: from["url"] as! String,
             title: from["title"] as! String,
+            publisher: from["publisher"] as! String,
             date: from["date"] as! String,
-            time: from["time"] as! String,
             platform: Platforms.init(rawValue: from["platform"] as! String)!,
-            platformTag: from["platformTag"] as! String,
+            platformTag: from["platform_tag"] as? String ?? "no tag",
             id: from["id"] as! Int,
             thumbnail: from["thumbnail"] as! String,
             tags: [])
@@ -79,8 +94,8 @@ class Clip {
         var array: [String:Any] = [:]
         array["url"] = from.url
         array["title"] = from.title
+        array["publisher"] = from.publisher
         array["date"] = from.date
-        array["time"] = from.time
         array["platform"] = from.platform.rawValue
         array["platformTag"] = from.platformTag
         array["id"] = from.id
@@ -105,24 +120,27 @@ class Clip {
         Firestore.firestore().collection("clips").document("\(from)").getDocument(completion: {
             (snapshot, error) in
             if let error = error {
-                print(error)
+                print("An error occurred downloading a clip.")
+                print("## \(error)")
                 return
             }
             
             //let _ = Clip(url: *, title: *, date: *, time: *, platform: *, platformTag: *, id: *, tags: *, votes: -)
+            print("Successfully downloaded snapshot.")
             if(snapshot?.get("title") != nil) {
+                print("title exists")
                 let title:String = snapshot?.get("title") as! String
+                let publisher:String = snapshot?.get("publisher") as! String
                 let url:String = snapshot?.get("url") as! String
-                let date:String = snapshot?.get("date") as! String
-                let time:String = snapshot?.get("time") as! String
+                let date:String = snapshot?.get("date") as? String ?? ""
                 let thumbnail:String = snapshot?.get("thumbnail") as! String
-                let platform_tag:String = snapshot?.get("platformTag") as! String
+                let platform_tag:String = snapshot?.get("platform_tag") as? String ?? ""
                 let platform:Platforms = Platforms(rawValue: snapshot?.get("platform") as! String)!
                 var tags:[Tag] = []
                 for tagString in snapshot?.get("tags") as! [String] {
                     tags.append(Tag(name: tagString))
                 }
-                completion(Clip(url: url, title: title, date: date, time: time, platform: platform, platformTag: platform_tag, id: from, thumbnail: thumbnail, tags: tags))
+                completion(Clip(url: url, title: title, publisher: publisher, date: date, platform: platform, platformTag: platform_tag, id: from, thumbnail: thumbnail, tags: tags))
                 
                 /*if snapshot?.get("votes") != nil {
                     let votes = snapshot?.get("votes")
@@ -131,27 +149,51 @@ class Clip {
         })
     }
     
-    public static func loadClips(range: Int, completion: @escaping (_ loaded: [Clip]) -> Void) {
+    /*public static func loadClips(with: Preference, range: Int, completion: @escaping (_ loaded: [Clip]) -> Void)
+    {
+        with.findRelevantClips(range: range)
+        { (clipIDs) in
+            var ids: [Int] = []
+            for idSet in clipIDs
+            {
+                let id = idSet.key
+                ids.append(id)
+            }
+            
+            loadClips(range: ids)
+            { (clips) in
+                completion(clips)
+            }
+        }
+    }*/
+    
+    public static func loadClips(range: Int, completion: @escaping (_ loaded: [Clip]) -> Void)
+    {
         
-        print("attempting to download clips")
-        var clips: [Clip] = []
-        for id in 0...range {
-            print("downloading \(id)")
-            getClip(from: id, completion:
-                { clip in
-                
-                    print("\(id) downloaded")
-                    print(clip.url)
-                clips.append(clip)
-                    print("\(clips.count) / \(range)")
-                if clips.count == range {
-                    completion(clips)
+        Firestore.firestore().collection("clips").order(by: "date", descending: true).limit(toLast: range).getDocuments
+            { (snapshot, error) in
+            
+                if let error = error
+                {
+                    print("Error retrieving data collection.")
+                    print(error)
+                    completion([])
+                } else
+                {
+                    var loaded: [Clip] = []
+                    print("There are \(snapshot!.count) clips downloaded out of the specified \(range).")
+                    for clipData in snapshot!.documents {
+                        let clip = getClip(from: clipData.data())
+                        loaded.append(clip)
+                    }
+                    
+                    completion(loaded)
                 }
-            })
         }
     }
     
-    public static func loadClips(range: [Int], completion: @escaping (_ loaded: [Clip]) -> Void) {
+    public static func loadClips(range: [Int], completion: @escaping (_ loaded: [Clip]) -> Void)
+    {
         
         var clips: [Clip] = []
         for id in range {
@@ -163,6 +205,25 @@ class Clip {
                     completion(clips)
                 }
             })
+        }
+    }
+    
+    public static func loadClipsFromSupporting(completion: @escaping (_ loaded: [Clip]) -> Void) {
+        
+        var clips: [Clip] = []
+        Preference.supportingClips(profile: Profile.current) {
+            (clipIDs) in
+            for clipID in clipIDs
+            {
+                getClip(from: clipID) { (clip) in
+                    clips.append(clip)
+                    if clips.count == clipIDs.count {
+                        // All clips are added to the array.
+                        let orderedList = Preference.orderByDate(relevantClips: clips)
+                        completion(orderedList)
+                    }
+                }
+            }
         }
     }
     
@@ -185,14 +246,14 @@ class Clip {
         return returningClips
     }*/
     
-    public static func getMalleableList(forClips: [Clip]) -> [Int:[Tag]] {
+    /*public static func getMalleableList(forClips: [Clip]) -> [Int:[Tag]] {
         var returningList: [Int:[Tag]] = [:]
         for clip in forClips {
             returningList[clip.id] = clip.tags
         }
         
         return returningList
-    }
+    }*/
     
     public static func generateID() -> Int
     {
@@ -202,28 +263,4 @@ class Clip {
         return int
     }
     
-    /*public static func identifyClips(with: [Tag]) -> [(key:Int,value:Int)] {
-        
-        var unorderedList: [Int:Int] = [:]
-        let clips = getMalleableList(forClips: loadClips(range: 20))
-        for clip in clips {
-            let tags = clip.value
-            for tag in tags {
-                for tag2 in with {
-                    if tag.name.lowercased() == tag2.name.lowercased() {
-                        if(unorderedList[clip.key] != nil) {
-                            let matches = unorderedList[clip.key]
-                            unorderedList[clip.key] = matches! + 1
-                        } else {
-                            unorderedList[clip.key] = 1
-                        }
-                    }
-                }
-            }
-        }
-        
-        let orderedList = unorderedList.sorted { $1.1 > $0.1}
-        
-        return orderedList
-    }*/
 }

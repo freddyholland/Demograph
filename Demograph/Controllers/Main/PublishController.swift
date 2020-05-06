@@ -46,6 +46,7 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
         
         pickerView.delegate = self
         urlField.delegate = self
+        titleField.delegate = self
         
         if Profile.current.id.isEmpty {
             print("Current ID is empty")
@@ -119,16 +120,20 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
         print(pickerView.selectedRow(inComponent: 0))
         print(userAccount.getShareablePlatforms().count)
         
-        let platform: Platforms = userAccount.getShareablePlatforms()[pickerView.selectedRow(inComponent: 0)].type
+        let platform: Platform = userAccount.getShareablePlatforms()[pickerView.selectedRow(inComponent: 0)]
         
-        switch platform {
+        switch platform.type {
         case .Instagram:
             // API Supported - Publish clip
-            API.getInstagramClip(id: url) {
+            API.getInstagramClip(id: url, publisher: platform) {
                 (clip) in
                 // Add 'clip' to users [Clip] array.
                 clip.title = title
-                Profile.current.clips?.append(clip.id)
+                clip.publisher = Profile.current.id
+                clip.date = DGTime.getDate()
+                var currentClips = Profile.current.clips
+                currentClips?.append(clip.id)
+                Profile.current.clips = currentClips
                 clip.save()
                 
                 Profile.attemptSaveCurrent(completion:
@@ -143,10 +148,15 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
             }
         case .Soundcloud:
             // API NOT Supported - Continue
-            API.getSoundcloudClip(id: url, publisher: userAccount.getShareablePlatforms()[pickerView.selectedRow(inComponent: 0)]) {
+            API.getSoundcloudClip(id: url, publisher: platform) {
                 (clip) in
                 // Add 'clip' to users [Clip] array.
-                Profile.current.clips?.append(clip.id)
+                clip.title = title
+                clip.publisher = Profile.current.id
+                clip.date = DGTime.getDate()
+                var currentClips = Profile.current.clips
+                currentClips?.append(clip.id)
+                Profile.current.clips = currentClips
                 clip.save()
                 
                 Profile.attemptSaveCurrent(completion:
@@ -161,10 +171,15 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
             }
         case .Spotify:
             // API Supported - Publish Clip
-            API.getSpotifyClip(id: url) {
+            API.getSpotifyClip(id: url, publisher: platform) {
                 (clip) in
                 // Add 'clip' to users [Clip] array.
-                Profile.current.clips?.append(clip.id)
+                clip.title = title
+                clip.publisher = Profile.current.id
+                clip.date = DGTime.getDate()
+                var currentClips = Profile.current.clips
+                currentClips?.append(clip.id)
+                Profile.current.clips = currentClips
                 clip.save()
                 
                 Profile.attemptSaveCurrent(completion:
@@ -182,7 +197,12 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
             API.getTwitchClip(id: url) {
                 (clip) in
                 // Add 'clip' to users [Clip] array.
-                Profile.current.clips?.append(clip.id)
+                clip.title = title
+                clip.publisher = Profile.current.id
+                clip.date = DGTime.getDate()
+                var currentClips = Profile.current.clips
+                currentClips?.append(clip.id)
+                Profile.current.clips = currentClips
                 clip.save()
                 
                 Profile.attemptSaveCurrent(completion:
@@ -197,10 +217,15 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
             }
         case .Youtube:
             //
-            API.getYoutubeClip(id: url) {
+            API.getYoutubeClip(id: url, publisher: platform) {
                 (clip) in
-                // Add 'clip' to users [Clip] array.
-                Profile.current.clips?.append(clip.id)
+                
+                clip.title = title
+                clip.publisher = Profile.current.id
+                clip.date = DGTime.getDate()
+                var currentClips = Profile.current.clips
+                currentClips?.append(clip.id)
+                Profile.current.clips = currentClips
                 clip.save()
                 
                 Profile.attemptSaveCurrent(completion:
@@ -217,17 +242,6 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
             print("This platform is not configured to share content.")
             return
         }
-        /*
-         URL: url
-         TITLE: title
-         DATE: get date from system
-         TIME: get time from system
-         PLATFORM: platform X
-         PLATFORMTAG: -
-         ID: find next available id
-         TAGS: -
-         VOTES: N/A
-         */
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

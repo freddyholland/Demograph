@@ -26,7 +26,7 @@ class API {
         
         // Establish variables.
         let url = "https://api.twitch.tv/kraken/clips/\(id)"
-        let clip = Clip(url: "", title: "", date: "", time: "", platform: Platforms.Twitch, platformTag: "", id: 0, thumbnail: "", tags: [])
+        let clip = Clip(url: "", title: "", publisher: "", date: "", platform: Platforms.Twitch, platformTag: "", id: 0, thumbnail: "", tags: [])
         
         // Make the request.
         AF.request(url, headers: headers)
@@ -62,11 +62,11 @@ class API {
     
     // MARK: - Spotify API
     
-    public static func getSpotifyClip(id: String, completion: @escaping (_ clip: Clip) -> Void)
+    public static func getSpotifyClip(id: String, publisher: Platform, completion: @escaping (_ clip: Clip) -> Void)
     {
         // Establish required headers.
         
-        let clip = Clip(url: "https://open.spotify.com/track/\(id)", title: "", date: "", time: "", platform: Platforms.Spotify, platformTag: "", id: Clip.generateID(), thumbnail: "", tags: [])
+        let clip = Clip(url: "https://open.spotify.com/track/\(id)", title: "", publisher: "", date: "", platform: Platforms.Spotify, platformTag: publisher.userTag, id: Clip.generateID(), thumbnail: "", tags: [])
         completion(clip)
         /*let headers: HTTPHeaders = [
             "Authorization: Bearer ":self.spotify_client
@@ -115,7 +115,7 @@ class API {
     public static func getSoundcloudClip(id: String, publisher: Platform, completion: @escaping (_ clip: Clip) -> Void)
     {
         
-        let clip = Clip(url: "https://soundcloud.com/\(publisher.userTag)/\(id)", title: "", date: "", time: "", platform: Platforms.Soundcloud, platformTag: "", id: Clip.generateID(), thumbnail: "", tags: [])
+        let clip = Clip(url: "https://soundcloud.com/\(publisher.userTag)/\(id)", title: "", publisher: "", date: "", platform: Platforms.Soundcloud, platformTag: publisher.userTag, id: Clip.generateID(), thumbnail: "", tags: [])
         completion(clip)
         
         /*
@@ -155,15 +155,15 @@ class API {
         }*/
     }
     
-    public static func getInstagramClip(id: String, completion: @escaping (_ clip: Clip) -> Void)
+    public static func getInstagramClip(id: String, publisher: Platform, completion: @escaping (_ clip: Clip) -> Void)
     {
-        let clip = Clip(url: "https://www.instagram.com/p/\(id)", title: "", date: "", time: "", platform: Platforms.Instagram, platformTag: "", id: Clip.generateID(), thumbnail: "https://www.instagram.com/p/\(id)/media/?size=m", tags: [])
+        let clip = Clip(url: "https://www.instagram.com/p/\(id)", title: "", publisher: "", date: "", platform: Platforms.Instagram, platformTag: publisher.userTag, id: Clip.generateID(), thumbnail: "https://www.instagram.com/p/\(id)/media/?size=m", tags: [])
         completion(clip)
     }
     
-    public static func getYoutubeClip(id: String, completion: @escaping (_ clip: Clip) -> Void)
+    public static func getYoutubeClip(id: String, publisher: Platform, completion: @escaping (_ clip: Clip) -> Void)
     {
-        let clip = Clip(url: "https://www.youtube.com/watch?v=\(id)", title: "", date: "", time: "", platform: Platforms.Youtube, platformTag: "", id: Clip.generateID(), thumbnail: "https://i1.ytimg.com/vi/\(id)/mqdefault.jpg", tags: [])
+        let clip = Clip(url: "https://www.youtube.com/watch?v=\(id)", title: "", publisher: "", date: "", platform: Platforms.Youtube, platformTag: publisher.userTag, id: Clip.generateID(), thumbnail: "https://i1.ytimg.com/vi/\(id)/mqdefault.jpg", tags: [])
         completion(clip)
     }
 }

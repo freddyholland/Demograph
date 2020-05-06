@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class Preference {
     var types: [Platforms]
@@ -18,53 +19,60 @@ class Preference {
         self.tags = tags
     }
     
-    func findRelevantClips(completion: @escaping (_ ids: [(key:Int,value:Int)]) -> Void)
+    func findRelevantClips(range: Int, completion: @escaping (_ clips: [Clip]) -> Void)
     {
-        let platforms: [Int:Platforms] = [0:Platforms.Instagram,1:Platforms.Youtube]
         
-        var checkIDs: [Int] = []
-        
-        for platform in platforms {
-            if types.contains(platform.value) {
-                checkIDs.append(platform.key)
+        Clip.loadClips(range: range) { (loadedClips) in
+            var toOrder: [Int:Clip] = [:]
+            var unorderedList: [Int:Int] = [:]
+            
+            print("Under Preference.swift/findRelevantClips(_): downloaded \(loadedClips.count) before filtering.")
+            
+            // Initial check - clips filter through if the platform is consistent with the Preference.
+            for loadedClip in loadedClips {
+                if self.types.contains(loadedClip.platform) {
+                    toOrder[loadedClip.id] = loadedClip
+                }
             }
-        }
-        
-        for clipID in checkIDs
-        {
-            Clip.getClip(from: clipID)
-            { (clip) in
-                var unorderedList: [Int:Int] = [:]
-                for tag in clip.tags
+            
+            print("Under Preference.swift/findRelevantClips(_): there are \(toOrder.count) clips available after filtering.")
+            
+            for unorderedClipSet in toOrder
+            {
+                let unorderedClip = unorderedClipSet.value
+                unorderedList[unorderedClip.id] = 0
+                for tag in unorderedClip.tags
                 {
                     for tag2 in self.tags
                     {
                         if tag.name.lowercased() == tag2.name.lowercased()
                         {
-                            if unorderedList[clip.id] != nil
-                            {
-                                // The clip has already been matched with one tag.
-                                // Add another match.
-                                
-                                let matches = unorderedList[clip.id]
-                                unorderedList[clip.id] = matches! + 1
-                            } else
-                            {
-                                // The clip has not yet been matched with a tag.
-                                // Set its value to 1.
-                                
-                                unorderedList[clip.id] = 1
-                            }
+                            //if unorderedList[unorderedClip.id] != nil
+                            //{
+                            let matches = unorderedList[unorderedClip.id]!
+                                unorderedList[unorderedClip.id] = matches + 1
+                            //} else
+                            //{
+                            //    unorderedList[unorderedClip.id] = 1
+                            //}
                         }
                     }
                 }
-                
-                // The for-loop check has finished.
-                // All values are accurate.
-                // Order the list.
-                let orderedList: [(key:Int,value:Int)] = unorderedList.sorted { $1.1 > $0.1 }
-                completion(orderedList)
             }
+            
+            print("unofficially: \(unorderedList)")
+            
+            let orderedList = unorderedList.sorted { $1.1 > $0.1 }
+            print("Under Preference.swift/findRelevantClips(_): returning a total \(orderedList.count) clips after complete filtering.")
+            
+            var forCompletion: [Clip] = []
+            for returnedIDSet in orderedList
+            {
+                let returnedID = returnedIDSet.key
+                forCompletion.append(toOrder[returnedID]!)
+            }
+            completion(forCompletion)
+            
         }
         
         
@@ -72,30 +80,29 @@ class Preference {
     
     public static func supportingClips(profile: Profile, completion: @escaping (_ clips: [Int]) -> Void) {
         
-        let supporting = profile.supporting
+        
         var count = 0
-        if supporting?.count != 0
+        if profile.supporting?.count != 0
         {
+            let supporting = profile.supporting!
             var mediaIDs: [Int] = []
-            for prof in supporting!
+            for prof in supporting
             {
-                Account.getProfileUID(tag: prof)
-                { (profID) in
-                    
-                    // Get all 'profID' media.
-                    Account.getProfile(userID: profID, completion:
-                        { (userProfile) in
-                            
-                        if userProfile.clips?.count != nil
-                        {
-                            mediaIDs.append(contentsOf: userProfile.clips!)
-                        }
-                        count += 1
-                        if count == supporting?.count {
-                            completion(mediaIDs)
-                        }
-                            
-                    })
+                print("Under Preference.swift: attempting to download all media data from \(prof) UID. ")
+                Account.getProfile(userID: prof)
+                { (userProfile) in
+                    print("unofficially after download: \(userProfile.local_tag) & \(userProfile.clips?.count)")
+                    if userProfile.clips?.count != 0
+                    {
+                        print("\(userProfile.clips?.count) clips have been downloaded from under 'Account.getProfile(_)'.")
+                        mediaIDs.append(contentsOf: userProfile.clips!)
+                    }
+                    count += 1
+                    print("Under Preference.swift: there are ( \(count)/\(supporting.count) ) supported users been read, with a returning \(mediaIDs.count) clips.")
+                    if count == supporting.count {
+                        print("Completion fired with \(mediaIDs.count) clips returning.")
+                        completion(mediaIDs)
+                    }
                 }
             }
             
@@ -108,18 +115,26 @@ class Preference {
         // Return clip IDS
     }
     
-    public static func orderByDate(relevantClips: [Clip]) -> [(key:Int,value:Double)] {
+    public static func orderByDate(relevantClips: [Clip]) -> [Clip] {
         
+        var idList: [Int:Clip] = [:]
         var unorderedList: [Int:Double] = [:]
         
         for clip in relevantClips
         {
+            idList[clip.id] = clip
             let publishedDate = clip.date
             let timeSincePublish = DGTime.timeFrom(date: publishedDate)
             unorderedList[clip.id] = timeSincePublish
         }
         
+        var reorderedClips: [Clip] = []
         let orderedList = unorderedList.sorted { $0.1 < $1.1 }
-        return orderedList
+        for item in orderedList {
+            reorderedClips.append(idList[item.key]!)
+        }
+        return reorderedClips
     }
+    
+    
 }

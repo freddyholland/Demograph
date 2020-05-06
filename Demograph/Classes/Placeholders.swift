@@ -21,10 +21,15 @@ class Placeholders {
         supporting: [],
         supporters: [],
         clips: [1])
-    // Clip(url: "https://www.youtube.com/watch?v=tlvbnqVXgok", title: "THE SCOTTS, Travis Scott, Kid Cudi - THE SCOTTS (Inside)", date: "", time: "", platform: Platforms.Youtube, platformTag: "Travis Scott", id: 0, tags: [], votes: [])
     
     public static let picture = UIImage(named: "default_picture")
     public static let banner = UIImage(named: "default_banner")
+    public static let emptyClip = Clip(url: "", title: "", publisher: "", date: "", platform: Platforms.Email, platformTag: "", id: 0, thumbnail: "", tags: [])
+    public static let temporary_preference = Preference(types: [Platforms.Youtube, Platforms.Spotify, Platforms.Instagram], tags: [Tag(name: "sypher"), Tag(name: "fortnite")])
+    
+    public static let green = UIColor(red: 96/255, green: 175/255, blue: 95/255, alpha: 1)
+    public static let dark_green = UIColor(red: 63/255, green: 116/255, blue: 63/255, alpha: 1)
+    
 }
 
 /*

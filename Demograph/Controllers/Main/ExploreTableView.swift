@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import EzPopup
 
 class ExploreTableView: UITableViewController {
     
@@ -18,19 +19,94 @@ class ExploreTableView: UITableViewController {
     //var clipsToLoad = [1]
     var loadedClips: [Clip] = []
     
+    var newClips: [Clip] = []
+    var hotClips: [Clip] = []
+    var supportingClips: [Clip] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setSelectedButton(b: newButton)
         print("loading clips")
-        Clip.loadClips(range: 5, completion: {
-            (loaded) in
-            print("clips are loaded")
-            self.loadedClips = loaded
-            self.tableView.reloadData()
-        })
+        
+        if (Profile.current.id.isEmpty)
+        {
+            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true)
+            { (timer) in
+                
+                if !Profile.current.local_tag.isEmpty
+                {
+                    let alert = AlertViewController.instantiate()
+                    alert.titleString = "Custom Controller!"
+                    alert.messageString = "Successfully loaded a custom Alert View Controller."
+                    alert.view.backgroundColor = UIColor.white
+                    
+                    let popupVC = PopupViewController(contentController: alert, popupWidth: 300, popupHeight: 200)
+                    popupVC.backgroundAlpha = 1
+                    popupVC.backgroundColor = UIColor.white
+                    popupVC.canTapOutsideToDismiss = true
+                    popupVC.shadowEnabled = false
+                    
+                    self.present(popupVC, animated: true, completion: nil)
+                    
+                    self.loadCategories()
+                    timer.invalidate()
+                }
+                
+                
+            }
+        } else {
+            loadCategories()
+        }
+        
+        
     }
-
+    
+    func loadCategories() {
+        
+        /*Clip.loadClips(range: 10)
+        { (loaded) in
+            for newClip in loaded {
+                self.newClips.append(newClip)
+            }
+            
+            print("loaded in 'new' data")
+            self.loadedClips = self.newClips
+            self.tableView.reloadData()
+        }*/
+        
+        /*Clip.loadClips(with: Placeholders.temporary_preference, range: 10)
+        { (loaded) in
+            for newClip in loaded {
+                self.newClips.append(newClip)
+            }
+            
+            print("loaded in 'new' data")
+            self.loadedClips = self.newClips
+            self.tableView.reloadData()
+        }*/
+        
+        Clip.loadClips(range: 10)
+        { (clips) in
+            print("Loaded new recent clips.")
+            self.newClips = Preference.orderByDate(relevantClips: clips)
+            self.loadedClips = self.newClips
+            self.tableView.reloadData()
+        }
+        
+        Placeholders.temporary_preference.findRelevantClips(range: 10)
+        { (clips) in
+            print("Loaded new clips with Preference.")
+            self.hotClips = clips
+        }
+        
+        Clip.loadClipsFromSupporting
+        { (clips) in
+            print("Loaded supporting clips.")
+            self.supportingClips = clips
+        }
+    }
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -64,6 +140,8 @@ class ExploreTableView: UITableViewController {
         
         // Configure the cell...
         let clip: Clip = loadedClips[indexPath.row]
+        print("The publisher ID is: " + clip.publisher)
+        print("Loaded for the clip with ID: \(clip.id)")
         var identifier = clip.platform.rawValue + "_identifier"
         
         switch clip.platform {
@@ -75,6 +153,7 @@ class ExploreTableView: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as! ImageTableCell
             cell.height = 205
             cell.clip = clip
+            cell.controller = self
             
             // Set the title as the video's title
             cell.firstNameLabel.text = "Posted on Instagram"
@@ -163,6 +242,7 @@ class ExploreTableView: UITableViewController {
             identifier = "video_identifier"
             
             let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as! VideoTableCell
+            print("In ETV clip publisher equals \(clip.publisher)")
             cell.clip = clip
             cell.height = 300
             cell.link = clip.url
@@ -212,13 +292,21 @@ class ExploreTableView: UITableViewController {
     
     @IBAction func newButtonPress(_ sender: Any) {
         setSelectedButton(b: newButton)
-        print(Clip.generateID())
+        
+        loadedClips = newClips
+        tableView.reloadData()
     }
     @IBAction func hotButtonPress(_ sender: Any) {
         setSelectedButton(b: hotButton)
+        
+        loadedClips = hotClips
+        tableView.reloadData()
     }
     @IBAction func supportingButtonPress(_ sender: Any) {
         setSelectedButton(b: supportingButton)
+        
+        loadedClips = supportingClips
+        tableView.reloadData()
     }
     
     func setSelectedButton(b: UIButton) {

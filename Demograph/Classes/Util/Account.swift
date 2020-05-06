@@ -28,6 +28,12 @@ class Account {
                 
                 if success {
                     print("account successfully created")
+                    /*updateUsername(profile: profile, tag: local_tag, completion: {
+                        success in
+                        if !success {
+                            print("An error occurred updating the created profile's username to the userbase.")
+                        }
+                    })*/
                 } else {
                     completionHandler(false, error)
                 }
@@ -38,6 +44,39 @@ class Account {
             completionHandler(true, error)
         })
     }
+    
+    public static func updateSupporting(profile: Profile)
+    {
+        let id = profile.id
+        let supporting = profile.supporting!
+        Firestore.firestore().collection("users").document(id).setData(["supporting":supporting], merge: true)
+        //Firestore.firestore().collection("users").document(id).setValue(supporting, forKey: "supporting")
+    }
+    
+    /*public static func updateUsername(profile: Profile, tag: String, completion: @escaping (_ success: Bool) -> Void) {
+        print("attempting to download userbase document")
+        Firestore.firestore().collection("info").document("userbase").getDocument
+            { (snapshot, error) in
+                
+                print("updating userbase")
+                if let error = error {
+                    print("An error occurred: \(error)")
+                    completion(false)
+                    return
+                }
+                
+                print("no errors, downloading data")
+                var data = snapshot?.data() as? [String:String] ?? [:]
+                if (data[profile.local_tag] != nil) {
+                    data.removeValue(forKey: profile.local_tag)
+                }
+                
+                data[tag] = profile.id
+                
+                Firestore.firestore().collection("info").document("userbase").setData(data)
+                completion(true)
+        }
+    }*/
     
     public static func attemptLogin(email: String, password: String, completionHandler: @escaping (_ success: Bool, _ error: Error?) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password, completion: {
@@ -78,6 +117,24 @@ class Account {
         })
     }
     
+    /*public static func getProfileUID(tag: String, completion: @escaping (_ uid: String) -> Void) {
+        Firestore.firestore().collection("info").document("userbase").getDocument
+            { (snapshot, error) in
+                if let error = error {
+                    print("An error occurred: \(error)")
+                    return
+                }
+                print("Data: \(snapshot?.data())")
+                print("Tag: \(tag)")
+                let userList = snapshot?.data()! as? [String:String] ?? [:]
+                if !userList[tag.lowercased()].isEmpty {
+                    completion(userList[tag.lowercased()]!)
+                } else {
+                    completion("")
+                }
+        }
+    }*/
+    
     public static func getProfile(userID: String, completion: @escaping (_ user: Profile) -> Void) {
         let profile = Profile(id: userID, local_tag: "", name: "", picture: UIImage(), banner: UIImage(), platforms: [], bio: "", supporting: [], supporters: [], clips: [])
         
@@ -103,7 +160,7 @@ class Account {
                 profile.name = snapshot?.get("name") as! String
                 
                 if snapshot?.get("bio") != nil {
-                    profile.bio = snapshot?.get("bio") as? String
+                    profile.bio = snapshot?.get("bio") as! String as String
                 }
                 
                 if snapshot?.get("platforms") != nil {
@@ -114,6 +171,14 @@ class Account {
                         platforms.append(Platform.getPlatform(from: platformArray))
                     }
                     profile.platforms = platforms
+                }
+                
+                if snapshot?.get("supporting") != nil {
+                    print("grabbing items from /supporting")
+                    let supporting = snapshot?.get("supporting") as! [String]
+                    profile.supporting = supporting
+                } else {
+                    profile.supporting = []
                 }
                 
                 Bucket.getUserPicture(id: userID, completion: {
@@ -136,10 +201,6 @@ class Account {
         })
         
         
-        
-        
-        
-        
     }
     
     public static func saveProfile(profile: Profile, completion: @escaping (_ success: Bool) -> Void) {
@@ -149,7 +210,8 @@ class Account {
             "local_tag":profile.local_tag.lowercased(),
             "name":profile.name,
             "bio":profile.bio!,
-            "clips":profile.clips!
+            "clips":profile.clips!,
+            "supporting":profile.supporting!
         ]
         
         print(profile.id)
@@ -158,6 +220,7 @@ class Account {
             data["clips"] = profile.clips
             //ref.setValue(profile.clips, forKey: "clips")
         }*/
+        
         if profile.platforms?.count != 0 {
             var platforms:[[String:String]] = []
             for platform in profile.platforms! {
@@ -175,6 +238,12 @@ class Account {
                 completion(false)
             } else {
                 print("### Document successfully written!")
+                /*updateUsername(profile: profile, tag: profile.local_tag, completion: {
+                    success in
+                    if !success {
+                        print("An error occurred updating the value of the users local_tag in the userbase.")
+                    }
+                })*/
                 completion(true)
             }
         }
