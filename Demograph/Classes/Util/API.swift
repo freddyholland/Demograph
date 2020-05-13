@@ -155,15 +155,66 @@ class API {
         }*/
     }
     
-    public static func getInstagramClip(id: String, publisher: Platform, completion: @escaping (_ clip: Clip) -> Void)
+    public static func getInstagramClip(id: String, publisher: Platform, completion: @escaping (_ clip: Clip, _ success: Bool) -> Void)
     {
         let clip = Clip(url: "https://www.instagram.com/p/\(id)", title: "", publisher: "", date: "", platform: Platforms.Instagram, platformTag: publisher.userTag, id: Clip.generateID(), thumbnail: "https://www.instagram.com/p/\(id)/media/?size=m", tags: [])
-        completion(clip)
+            
+        // Create request from URL
+        
+        let url = URL(string: "https://www.instagram.com/p/\(id)/media/?size=m")
+        print("%% \(url)")
+        
+        if url == nil {
+            completion(Placeholders.emptyClip, false)
+            return
+        }
+        
+        let request = URLRequest(url: url!)
+        let session = URLSession.shared
+            
+        // Extract data
+        let dataTask = session.dataTask(with: request as URLRequest, completionHandler: {
+            (data:Data?, response:URLResponse?, error:Error?) in
+                
+            DispatchQueue.main.async {
+                    
+                // Find cell's imageView and set the image to the retrieved data.
+                let image = UIImage(data: data!)
+                
+                if image != nil {
+                    completion(clip, true)
+                } else {
+                    completion(Placeholders.emptyClip, false)
+                }
+            }
+        })
+        dataTask.resume()
     }
     
-    public static func getYoutubeClip(id: String, publisher: Platform, completion: @escaping (_ clip: Clip) -> Void)
+    public static func getYoutubeClip(id: String, publisher: Platform, completion: @escaping (_ clip: Clip, _ success: Bool) -> Void)
     {
         let clip = Clip(url: "https://www.youtube.com/watch?v=\(id)", title: "", publisher: "", date: "", platform: Platforms.Youtube, platformTag: publisher.userTag, id: Clip.generateID(), thumbnail: "https://i1.ytimg.com/vi/\(id)/mqdefault.jpg", tags: [])
-        completion(clip)
+        
+        // Create request from URL
+        let request = URLRequest(url: URL(string: clip.thumbnail)!)
+        let session = URLSession.shared
+            
+        // Extract data
+        let dataTask = session.dataTask(with: request as URLRequest, completionHandler: {
+            (data:Data?, response:URLResponse?, error:Error?) in
+                
+            DispatchQueue.main.async {
+                    
+                // Find cell's imageView and set the image to the retrieved data.
+                let image = UIImage(data: data!)
+                
+                if image != nil {
+                    completion(clip, true)
+                } else {
+                    completion(Placeholders.emptyClip, false)
+                }
+            }
+        })
+        dataTask.resume()
     }
 }

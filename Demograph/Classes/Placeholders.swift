@@ -25,7 +25,7 @@ class Placeholders {
     public static let picture = UIImage(named: "default_picture")
     public static let banner = UIImage(named: "default_banner")
     public static let emptyClip = Clip(url: "", title: "", publisher: "", date: "", platform: Platforms.Email, platformTag: "", id: 0, thumbnail: "", tags: [])
-    public static let temporary_preference = Preference(types: [Platforms.Youtube, Platforms.Spotify, Platforms.Instagram], tags: [Tag(name: "sypher"), Tag(name: "fortnite")])
+    public static let temporary_preference = Preference(types: [Platforms.Youtube, Platforms.Spotify, Platforms.Instagram], tags: [])
     
     public static let green = UIColor(red: 96/255, green: 175/255, blue: 95/255, alpha: 1)
     public static let dark_green = UIColor(red: 63/255, green: 116/255, blue: 63/255, alpha: 1)

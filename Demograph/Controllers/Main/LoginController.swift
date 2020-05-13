@@ -37,11 +37,13 @@ class LoginController: UIViewController, UITextFieldDelegate {
         
         guard let email = emailField.text, !email.isEmpty else {
             print("Email field is not filled in")
+            DGAlert.errorAlert(with: 101, controller: self)
             return
         }
         
         guard let password = passwordField.text, !password.isEmpty else {
             print("Password field is not filled in")
+            DGAlert.errorAlert(with: 101, controller: self)
             return
         }
         
@@ -54,6 +56,7 @@ class LoginController: UIViewController, UITextFieldDelegate {
                 print("logged in")
                 self.segueToMainView()
             } else {
+                DGAlert.errorAlert(with: 201, controller: self)
                 print(error!)
             }
         })
@@ -68,6 +71,8 @@ class LoginController: UIViewController, UITextFieldDelegate {
             
             if success {
                 print("Successfully loaded current controller.")
+            } else {
+                DGAlert.errorAlert(with: 202, controller: self)
             }
         })
         

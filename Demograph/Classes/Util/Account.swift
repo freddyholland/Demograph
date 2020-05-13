@@ -181,6 +181,14 @@ class Account {
                     profile.supporting = []
                 }
                 
+                if snapshot?.get("clips") != nil {
+                    print("grabbing items from /clips")
+                    let clips = snapshot?.get("clips") as! [Int]
+                    profile.clips = clips
+                } else {
+                    profile.clips = []
+                }
+                
                 Bucket.getUserPicture(id: userID, completion: {
                     image in
                     profile.picture = image

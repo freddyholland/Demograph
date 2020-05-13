@@ -32,7 +32,7 @@ class AudioTableCell: UITableViewCell {
         
         if (clip.publisher.isEmpty) || (Profile.current.id.isEmpty)
         {
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true)
+            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true)
             { (timer) in
                 
                 if !self.clip.publisher.isEmpty && !Profile.current.local_tag.isEmpty

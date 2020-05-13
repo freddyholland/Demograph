@@ -65,6 +65,10 @@ class Platform {
             return Platforms.Email
         }
     }
+    
+    public static func getShareablePlatforms() -> [Platforms] {
+        return [Platforms.Instagram, Platforms.Soundcloud, Platforms.Spotify, Platforms.Twitch, Platforms.Youtube]
+    }
 }
 
 enum Platforms : String, CaseIterable {

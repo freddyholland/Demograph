@@ -8,7 +8,13 @@
 
 import UIKit
 
-class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
+class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource, TagSearchDelegate {
+    
+    func onCompleteDataInput(data: [String]) {
+        createdClip.tags = data
+        createdClip.save()
+    }
+    
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         1
@@ -37,6 +43,8 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
     @IBOutlet weak var pickerView: UIPickerView!
     @IBOutlet weak var titleField: UITextField!
     
+    var createdClip: Clip = Placeholders.emptyClip
+    
     var userAccount = Placeholders.userAccount
     var allowModification: Bool = false
     
@@ -48,9 +56,10 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
         urlField.delegate = self
         titleField.delegate = self
         
+        
         if Profile.current.id.isEmpty {
             print("Current ID is empty")
-            Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true, block: {
+            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true, block: {
                 timer in
                 print("checking if value changed")
                 if !Profile.current.id.isEmpty {
@@ -81,6 +90,7 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                 
                 print("### Loaded all profile data. \(Profile.current.local_tag)")
             } else {
+                DGAlert.errorAlert(with: 202, controller: self)
                 self.allowModification = true
                 print("### An error occurred retrieving profile information")
             }
@@ -103,16 +113,19 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
         
         if userAccount.getShareablePlatforms().count == 0 {
             print("You do not have any shareable platforms.")
+            DGAlert.errorAlert(with: 301, controller: self)
             return
         }
         
         guard let url = urlField.text, !url.isEmpty else {
             // The url field is EMPTY
+            DGAlert.errorAlert(with: 101, controller: self)
             return
         }
         
         guard let title = titleField.text, !title.isEmpty else {
             // The title field is EMPTY
+            DGAlert.errorAlert(with: 101, controller: self)
             return
         }
         
@@ -126,15 +139,23 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
         case .Instagram:
             // API Supported - Publish clip
             API.getInstagramClip(id: url, publisher: platform) {
-                (clip) in
+                (clip, success) in
+                
+                if !success {
+                    DGAlert.errorAlert(with: 107, controller: self)
+                    return
+                }
+                
                 // Add 'clip' to users [Clip] array.
                 clip.title = title
                 clip.publisher = Profile.current.id
                 clip.date = DGTime.getDate()
-                var currentClips = Profile.current.clips
-                currentClips?.append(clip.id)
-                Profile.current.clips = currentClips
+                //var currentClips = Profile.current.clips
+                //currentClips?.append(clip.id)
+                //Profile.current.clips = currentClips
                 clip.save()
+                self.createdClip = clip
+                self.openClipTagSelection()
                 
                 Profile.attemptSaveCurrent(completion:
                     { (success) in
@@ -143,6 +164,7 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                             print("Successfully uploaded post.")
                         } else {
                             print("Error uploading post.")
+                            DGAlert.errorAlert(with: 204, controller: self)
                         }
                 })
             }
@@ -158,6 +180,8 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                 currentClips?.append(clip.id)
                 Profile.current.clips = currentClips
                 clip.save()
+                self.createdClip = clip
+                self.openClipTagSelection()
                 
                 Profile.attemptSaveCurrent(completion:
                     { (success) in
@@ -166,6 +190,7 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                             print("Successfully uploaded post.")
                         } else {
                             print("Error uploading post.")
+                            DGAlert.errorAlert(with: 204, controller: self)
                         }
                 })
             }
@@ -181,6 +206,8 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                 currentClips?.append(clip.id)
                 Profile.current.clips = currentClips
                 clip.save()
+                self.createdClip = clip
+                self.openClipTagSelection()
                 
                 Profile.attemptSaveCurrent(completion:
                     { (success) in
@@ -189,6 +216,7 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                             print("Successfully uploaded post.")
                         } else {
                             print("Error uploading post.")
+                            DGAlert.errorAlert(with: 204, controller: self)
                         }
                 })
             }
@@ -204,6 +232,8 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                 currentClips?.append(clip.id)
                 Profile.current.clips = currentClips
                 clip.save()
+                self.createdClip = clip
+                self.openClipTagSelection()
                 
                 Profile.attemptSaveCurrent(completion:
                     { (success) in
@@ -212,13 +242,19 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                             print("Successfully uploaded post.")
                         } else {
                             print("Error uploading post.")
+                            DGAlert.errorAlert(with: 204, controller: self)
                         }
                 })
             }
         case .Youtube:
             //
             API.getYoutubeClip(id: url, publisher: platform) {
-                (clip) in
+                (clip, success) in
+                
+                if !success {
+                    DGAlert.errorAlert(with: 107, controller: self)
+                    return
+                }
                 
                 clip.title = title
                 clip.publisher = Profile.current.id
@@ -227,6 +263,8 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                 currentClips?.append(clip.id)
                 Profile.current.clips = currentClips
                 clip.save()
+                self.createdClip = clip
+                self.openClipTagSelection()
                 
                 Profile.attemptSaveCurrent(completion:
                     { (success) in
@@ -235,6 +273,7 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                             print("Successfully uploaded post.")
                         } else {
                             print("Error uploading post.")
+                            DGAlert.errorAlert(with: 204, controller: self)
                         }
                 })
             }
@@ -243,6 +282,19 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
             return
         }
     }
+    
+    @IBAction func helpPressed(_ sender: Any) {
+        DGAlert.alert(withTitle: "What's a Media ID?", message: "A media ID is the unique string that follows the URL. For example: The post www.instagram.com/p/B_SWjMrFllU/ has a media ID of B_SWjMrFllU", controller: self)
+    }
+    
+    func openClipTagSelection() {
+        let search = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "tagSearchController") as! TagSearchController
+        search.delegate = self
+        search.selected = []
+        
+        self.present(search, animated: true, completion: nil)
+    }
+    
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)

@@ -17,10 +17,10 @@ class Clip {
     var platform: Platforms
     var platformTag: String
     var id: Int
-    var tags: [Tag]
+    var tags: [String]
     var thumbnail: String
     
-    init(url:String, title:String, publisher: String, date:String, platform: Platforms, platformTag: String, id: Int, thumbnail: String, tags: [Tag]) {
+    init(url:String, title:String, publisher: String, date:String, platform: Platforms, platformTag: String, id: Int, thumbnail: String, tags: [String]) {
         self.url = url
         self.title = title
         self.publisher = publisher
@@ -36,16 +36,17 @@ class Clip {
         // MARK: - Save the clip to the database under 'ID'
         let id:String = "\(self.id)"
         let doc = Firestore.firestore().collection("clips").document(id)
-        var data: [String:Any] = ["id":self.id, "title":self.title, "publisher": self.publisher, "platform":self.platform.rawValue, "platform_tag":self.platformTag, "thumbnail":self.thumbnail, "date":self.date,"url":self.url]
-        if self.tags.count != 0 {
-            var tag_strings: [String] = []
-            for tag in self.tags {
-                tag_strings.append(tag.name)
-            }
-            data["tags"] = tag_strings
-        } else {
-            data["tags"] = []
-        }
+        let data: [String:Any] = [
+            "id":self.id,
+            "title":self.title,
+            "publisher": self.publisher,
+            "platform":self.platform.rawValue,
+            "platform_tag":self.platformTag,
+            "thumbnail":self.thumbnail,
+            "date":self.date,
+            "url":self.url,
+            "tags":self.tags
+        ]
         
         doc.setData(data)
         
@@ -77,14 +78,7 @@ class Clip {
             platformTag: from["platform_tag"] as? String ?? "no tag",
             id: from["id"] as! Int,
             thumbnail: from["thumbnail"] as! String,
-            tags: [])
-        
-        let stringTags: [String] = from["tags"] as! [String]
-        var tags: [Tag] = []
-        for tagString in stringTags {
-            tags.append(Tag(name: tagString))
-        }
-        clip.tags = tags
+            tags:from["tags"] as! [String])
         
         return clip
         
@@ -100,15 +94,7 @@ class Clip {
         array["platformTag"] = from.platformTag
         array["id"] = from.id
         array["thumbnail"] = from.thumbnail
-        if from.tags.count != 0 {
-            var stringTags: [String] = []
-            for tag in from.tags {
-                stringTags.append(tag.name)
-            }
-            array["tags"] = stringTags
-        } else {
-            array["tags"] = []
-        }
+        array["tags"] = from.tags
         
         return array
     }
@@ -136,10 +122,8 @@ class Clip {
                 let thumbnail:String = snapshot?.get("thumbnail") as! String
                 let platform_tag:String = snapshot?.get("platform_tag") as? String ?? ""
                 let platform:Platforms = Platforms(rawValue: snapshot?.get("platform") as! String)!
-                var tags:[Tag] = []
-                for tagString in snapshot?.get("tags") as! [String] {
-                    tags.append(Tag(name: tagString))
-                }
+                let tags:[String] = snapshot?.get("tags") as! [String]
+                
                 completion(Clip(url: url, title: title, publisher: publisher, date: date, platform: platform, platformTag: platform_tag, id: from, thumbnail: thumbnail, tags: tags))
                 
                 /*if snapshot?.get("votes") != nil {
@@ -215,6 +199,7 @@ class Clip {
             (clipIDs) in
             for clipID in clipIDs
             {
+                
                 getClip(from: clipID) { (clip) in
                     clips.append(clip)
                     if clips.count == clipIDs.count {
@@ -223,6 +208,7 @@ class Clip {
                         completion(orderedList)
                     }
                 }
+                
             }
         }
     }

@@ -21,6 +21,7 @@ class ProfileTableView: UIViewController, UITableViewDataSource, UITableViewDele
     
     var userAccount = Placeholders.userAccount
     var allowModification: Bool = false
+    private let reload = UIRefreshControl()
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let platformCount = userAccount.platforms!.count
@@ -89,9 +90,12 @@ class ProfileTableView: UIViewController, UITableViewDataSource, UITableViewDele
         platformTableView.delegate = self
         platformTableView.dataSource = self
         
+        self.platformTableView.refreshControl = reload
+        reload.addTarget(self, action: #selector(self.reloadFullPage), for: .valueChanged)
+        
         if Profile.current.id.isEmpty {
             print("Current ID is empty")
-            Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true, block: {
+            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true, block: {
                 timer in
                 print("checking if value changed")
                 if !Profile.current.id.isEmpty {
@@ -109,8 +113,9 @@ class ProfileTableView: UIViewController, UITableViewDataSource, UITableViewDele
         
     }
     
-    @IBAction func reloadPressed(_ sender: Any) {
+    @objc func reloadFullPage() {
         loadAllContent()
+        reload.endRefreshing()
     }
     
     func loadAllContent() {

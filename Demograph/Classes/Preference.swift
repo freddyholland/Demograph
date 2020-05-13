@@ -8,12 +8,16 @@
 
 import Foundation
 import UIKit
+import FirebaseFirestore
 
 class Preference {
-    var types: [Platforms]
-    var tags: [Tag]
     
-    init(types: [Platforms], tags: [Tag])
+    public static var current = Preference(types: [], tags: [])
+    
+    var types: [Platforms]
+    var tags: [String]
+    
+    init(types: [Platforms], tags: [String])
     {
         self.types = types
         self.tags = tags
@@ -45,7 +49,7 @@ class Preference {
                 {
                     for tag2 in self.tags
                     {
-                        if tag.name.lowercased() == tag2.name.lowercased()
+                        if tag.lowercased() == tag2.lowercased()
                         {
                             //if unorderedList[unorderedClip.id] != nil
                             //{
@@ -80,10 +84,11 @@ class Preference {
     
     public static func supportingClips(profile: Profile, completion: @escaping (_ clips: [Int]) -> Void) {
         
-        
         var count = 0
+        print("% if \(profile.supporting?.count) > 0")
         if profile.supporting?.count != 0
         {
+            print("passed")
             let supporting = profile.supporting!
             var mediaIDs: [Int] = []
             for prof in supporting
@@ -136,5 +141,65 @@ class Preference {
         return reorderedClips
     }
     
+    public static func getSavedPreference(forUser: String, completion: @escaping (_ preference: Preference) -> Void) {
+        
+        let ref = Firestore.firestore().collection("users").document(forUser)
+        
+        print("attempting to load preference from ref-point")
+        let preference: Preference = Preference(types: [], tags: [])
+        ref.getDocument
+            { (snapshot, err) in
+                
+                if let err = err {
+                    //DGAlert.errorAlert(with: 205, controller: self)
+                    print(err)
+                    return
+                }
+                
+                print("no errors occurred")
+                
+                if let snap_platforms = snapshot?.get("preferred_platforms") {
+                    print("successfully downloaded at least 1 platform")
+                    
+                    let platformStrings = snap_platforms as! [String]
+                    var platforms: [Platforms] = []
+                    for string in platformStrings {
+                        print("cycling through platform \(string)")
+                        platforms.append(Platforms(rawValue: string)!)
+                    }
+                    
+                    preference.types = platforms
+                    print("\(platforms.count) platforms returned.")
+                    
+                }
+                
+                if let snap_tags = snapshot?.get("preferred_tags") {
+                    let tagStrings = snap_tags as! [String]
+                    
+                    preference.tags = tagStrings
+                }
+                
+                completion(preference)
+                
+        }
+        
+    }
+    
+    func savePreference(forUser: String) {
+        
+        let ref = Firestore.firestore().collection("users").document(forUser)
+        
+        let platforms = self.types
+        let tags = self.tags
+        
+        var stringPlatforms: [String] = []
+        for platform in platforms {
+            stringPlatforms.append(platform.rawValue)
+        }
+        
+        var data = ["preferred_platforms":stringPlatforms, "preferred_tags":tags]
+        
+        ref.setData(data, merge: true)
+    }
     
 }
