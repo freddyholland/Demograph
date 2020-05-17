@@ -43,9 +43,14 @@ class DGError {
             message = "An error occurred attempting to retrieve user preferences."
         case 206:
             message = "An error occurred trying to save user preferences."
+        case 207:
+            message = "An error occurred trying to delete the specified clip."
             
         case 301:
             message = "You currently have no configured platforms for sharing. You can manage these in Profile > Manage > Manage Platforms"
+            
+        case 501:
+            message = "Only premium users can publish more than 5 clips."
             
         default:
             message = "An unknown error occurred. Please feel free to contact the support team: support@fjcode.net"

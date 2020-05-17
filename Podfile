@@ -11,6 +11,8 @@ target 'Demograph' do
   pod 'Firebase/Auth'
   pod 'Firebase/Storage'
   pod 'Firebase/Firestore'
+  pod 'Google-Mobile-Ads-SDK' 
+  pod 'FBAudienceNetwork' 
   pod 'Alamofire', '~> 5.1' 
   pod 'EzPopup'
 

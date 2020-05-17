@@ -154,7 +154,7 @@ class Clip {
     public static func loadClips(range: Int, completion: @escaping (_ loaded: [Clip]) -> Void)
     {
         
-        Firestore.firestore().collection("clips").order(by: "date", descending: true).limit(toLast: range).getDocuments
+        Firestore.firestore().collection("clips").order(by: "date", descending: true).limit(toLast: range-1).getDocuments
             { (snapshot, error) in
             
                 if let error = error
@@ -211,6 +211,9 @@ class Clip {
                 
             }
         }
+    }
+    
+    public static func userPosted(mediaID: String, user: Profile) {
     }
     
     /*public static func loadHotClips(range: Int) -> [Clip] {

@@ -12,6 +12,8 @@ class PreferencePlatformCell: UITableViewCell {
     
     @IBOutlet weak var platformImage: UIImageView!
     
+    var platform: String!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

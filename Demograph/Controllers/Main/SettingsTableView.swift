@@ -13,7 +13,7 @@ class SettingsTableView: UITableViewController {
     
     
     let settings: [String] = ["Username", "Full Name", "Bio", "Picture", "Banner"]
-    let management: [String] = ["Manage Platforms", "Manage Ads"]
+    let management: [String] = ["Manage Platforms", "Manage Ads", "Demograph Premium"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -221,6 +221,10 @@ class SettingsTableView: UITableViewController {
             self.present(platformManager, animated: true, completion: nil)
         } else if row == 6 {
             // MARK:- MANAGE ADS
+            let adManager = self.storyboard?.instantiateViewController(withIdentifier: "adManagerTableView") as! AdManagerTableView
+            self.present(adManager, animated: true, completion: nil)
+        } else if row == 7 {
+            print("Manage premium subscription.")
         }
     }
 

@@ -14,6 +14,8 @@ class ClipInfoCell: UITableViewCell {
     @IBOutlet weak var clipTitleLabel: UILabel!
     @IBOutlet weak var clipInfoLabel: UILabel!
     
+    var id: Int!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

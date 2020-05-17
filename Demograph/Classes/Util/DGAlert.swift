@@ -49,4 +49,14 @@ class DGAlert {
         alert.returnButton.titleLabel?.text = button
     }
     
+    public static func present(controller: UIViewController, on: UIViewController) {
+        let popupVC = PopupViewController(contentController: controller, popupWidth: 300, popupHeight: 200)
+        popupVC.backgroundAlpha = 0.6
+        popupVC.backgroundColor = UIColor.white
+        popupVC.canTapOutsideToDismiss = false
+        popupVC.shadowEnabled = false
+        
+        on.present(popupVC, animated: true, completion: nil)
+    }
+    
 }

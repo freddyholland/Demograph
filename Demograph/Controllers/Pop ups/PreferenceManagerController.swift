@@ -9,7 +9,8 @@
 import UIKit
 import EzPopup
 
-class PreferenceManagerController: UIViewController, UITableViewDelegate, UITableViewDataSource, TagSearchDelegate {
+class PreferenceManagerController: UIViewController, UITableViewDelegate, UITableViewDataSource, TagSearchDelegate, InputAlertDelegate {
+    
     
     func onCompleteDataInput(data: [String]) {
         // This function is called when the Tag controller is updated.
@@ -78,6 +79,7 @@ class PreferenceManagerController: UIViewController, UITableViewDelegate, UITabl
             let platform = preference.types[indexPath.row]
             // Load relevant data for platforms.
             let cell = tableView.dequeueReusableCell(withIdentifier: "platformIdentifier", for: indexPath) as! PreferencePlatformCell
+            cell.platform = platform.rawValue
             cell.platformImage.image = UIImage(named: "\(platform.rawValue.lowercased())")
             return cell
             
@@ -104,14 +106,71 @@ class PreferenceManagerController: UIViewController, UITableViewDelegate, UITabl
         
         if tableView == tagTableView {
             
-            let tag = preference.tags[indexPath.row]
-            DGAlert.alert(withTitle: "Manage Tag", message: "Do you want to delete this tag?", controller: self)
+            // Set the selected tag
+            selectedTable = tagTableView
+            selectedRow = indexPath
+            
+            // Instantiate a new selection controller
+            let svc = SelectionViewController.instantiate()
+            svc.delegate = self
+            svc.headingString = "Manage Tag"
+            svc.messageString = "Do you want to delete this tag?"
+            
+            // Present the controller
+            DGAlert.present(controller: svc, on: self)
             
         } else if tableView == platformTableView {
             
-            let platform = preference.types[indexPath.row]
-            DGAlert.alert(withTitle: "Manage Platform", message: "Do you want to delete this platform?", controller: self)
-            // Get response to delete or dismiss.
+            // Set the selected platform
+            selectedTable = platformTableView
+            selectedRow = indexPath
+            
+            // Instantiate a new selection controller
+            let svc = SelectionViewController.instantiate()
+            svc.delegate = self
+            svc.headingString = "Manage Platform"
+            svc.messageString = "Do you want to delete this tag?"
+            
+            // Present the controller
+            DGAlert.present(controller: svc, on: self)
+        }
+    }
+    
+    var selectedTable: UITableView!
+    var selectedRow: IndexPath!
+    
+    func onBooleanInput(result: Bool) {
+        print(result)
+        if result == false {
+            self.dismiss(animated: true, completion: nil)
+        } else {
+            
+            if selectedTable == platformTableView {
+                
+                let cell = selectedTable.cellForRow(at: selectedRow) as! PreferencePlatformCell
+                let platform = Platforms(rawValue: cell.platform)
+                
+                let new_preferences = preference.types.filter( { $0 != platform } )
+                
+                preference.types = new_preferences
+                preference.savePreference(forUser: Profile.current.id)
+                
+                platformTableView.reloadData()
+                
+            } else if selectedTable == tagTableView {
+                
+                let cell = selectedTable.cellForRow(at: selectedRow) as! PreferenceTagCell
+                let tag = cell.tagLabel.text?.lowercased()
+                // Remove the tag from the current preferences
+                let new_preferences = preference.tags.filter( { $0 != tag } )
+                // Save current preferences
+                preference.tags = new_preferences
+                preference.savePreference(forUser: Profile.current.id)
+                
+                tagTableView.reloadData()
+            }
+            
+            self.dismiss(animated: true, completion: nil)
             
         }
     }

@@ -24,6 +24,7 @@ class TagSearchController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        searchbar.returnKeyType = .continue
         searchbar.delegate = self
     }
 
@@ -71,21 +72,33 @@ class TagSearchController: UITableViewController {
         
         // Get the tag that has been selected
         var selectedTag: String
-        if loadSuggestions {
-            selectedTag = toDisplay[indexPath.row]
-        } else {
-            selectedTag = selected[indexPath.row]
+        if loadSuggestions
+        {
+            selectedTag = toDisplay[indexPath.row].lowercased()
+        } else
+        {
+            selectedTag = selected[indexPath.row].lowercased()
         }
         
-        if selected.contains(selectedTag)
+        selectTag(tag: selectedTag)
+    }
+    
+    func selectTag(tag: String)
+    {
+        // Attempt to add the tag to the selected array.
+        if selected.contains(tag)
         {
-            selected = selected.filter({ $0.lowercased() != selectedTag.lowercased() })
+            // If the array already contains the tag then remove any instances of it.
+            selected = selected.filter({ $0.lowercased() != tag.lowercased() })
             print("The selected tag was already in SELECTED array, removed it.")
-        } else {
-            selected.append(selectedTag)
+        } else
+        {
+            // If the array doesn't contain the tag then add it.
+            selected.append(tag)
             print("Added the selected tag to SELECTED array.")
         }
         
+        searchbar.text = ""
         tableView.reloadData()
     }
     
@@ -95,7 +108,9 @@ class TagSearchController: UITableViewController {
 
 extension TagSearchController: UISearchBarDelegate {
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String)
+    {
+        // Called when the entered text changes.
         
         // Get the current string value of the search bar.
         // = searchText
@@ -103,20 +118,46 @@ extension TagSearchController: UISearchBarDelegate {
         // Read the current text and filter all tags based on this.
         // Note: It might be worth only downloading relevant tags after 3-4 characters are entered in the field.
         
-        if searchText.count < 3 {
+        if searchText.count < 3
+        {
+            // There are less than 3 characters in the field
+            // Therefore; show pre-exising tags
             loadSuggestions = false
-        } else {
+        } else
+        {
+            // There are 3 or more characters in the field
+            // Therefore; show suggestions
             loadSuggestions = true
             toDisplay = tags.filter({ $0.prefix(searchText.count) == searchText })
         }
         
+        // Display the newly added data.
         tableView.reloadData()
     }
     
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar)
+    {
         
-        // Return the SELECTED array to the original class.
+        // Check if the string in the searchbar is valid.
+        guard let tag = searchBar.text?.lowercased(), !tag.isEmpty else
+        {
+            // If its not then return.
+            return
+        }
+        
+        // Otherwise add the tag and reset the searchbar.
+        selectTag(tag: tag)
+        searchBar.text = ""
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar)
+    {
+        
+        // The cancel button has been pressed on the searchbar.
+        // Using the delegate; return the data in the table.
         delegate?.onCompleteDataInput(data: selected)
+        
+        // Then dismiss the controller.
         self.dismiss(animated: true, completion: nil)
         
     }

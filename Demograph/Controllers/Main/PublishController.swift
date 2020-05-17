@@ -13,6 +13,10 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
     func onCompleteDataInput(data: [String]) {
         createdClip.tags = data
         createdClip.save()
+        
+        DGAlert.alert(withTitle: "Success!", message: "Sucessfully created ad.", controller: self)
+        urlField.text = ""
+        titleField.text = ""
     }
     
     
@@ -126,6 +130,11 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
         guard let title = titleField.text, !title.isEmpty else {
             // The title field is EMPTY
             DGAlert.errorAlert(with: 101, controller: self)
+            return
+        }
+        
+        if Profile.current.clips?.count == 5 {
+            DGAlert.errorAlert(with: 501, controller: self)
             return
         }
         

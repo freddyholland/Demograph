@@ -50,7 +50,7 @@ class VideoTableCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
         
-        //height = title.frame.height + videoThumbnail.frame.height + supportButton.frame.height + 16
+        self.height = 295
         
         let touchGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.imageTapped(_:)))
         touchGesture.delegate = self

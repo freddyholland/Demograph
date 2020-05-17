@@ -84,4 +84,6 @@ enum Platforms : String, CaseIterable {
     case Email // Disabled.
     case Facebook // Disabled.
     case Twitter // Disabled.
+    
+    case Advertisement
 }

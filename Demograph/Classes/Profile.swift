@@ -8,6 +8,7 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseFirestore
 
 class Profile {
     
@@ -52,6 +53,33 @@ class Profile {
         
         return shareablePlatforms
         
+    }
+    
+    func removeClip(withID: Int, completion: @escaping (_ success: Bool) -> Void) {
+        
+        // Check if the user has a clip with specified ID
+        if !(self.clips?.contains(withID) ?? false) {
+            // User doesn't have a clip with the specified ID.
+            completion(false)
+        }
+        
+        // Update the users [clips]
+        self.clips = self.clips?.filter( { $0 == withID } )
+        
+        // Set this instance of Profile as the current and save to the database.
+        Profile.current = self
+        Profile.attemptSaveCurrent { (_) in }
+        
+        let clips_reference = Firestore.firestore().collection("clips")
+        clips_reference.document("\(withID)").delete
+            { (err) in
+                if let error = err {
+                    print("An error occurred: \(error)")
+                    completion(false)
+                } else {
+                    completion(true)
+                }
+        }
     }
     
     public static var current: Profile = Profile(id: "", local_tag: "", name: "", picture: UIImage(), banner: UIImage(), platforms: [], bio: "", supporting: [], supporters: [], clips: [])

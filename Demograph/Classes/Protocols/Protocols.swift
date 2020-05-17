@@ -12,3 +12,7 @@ import UIKit
 protocol TagSearchDelegate {
     func onCompleteDataInput(data: [String])
 }
+
+protocol InputAlertDelegate {
+    func onBooleanInput(result: Bool)
+}

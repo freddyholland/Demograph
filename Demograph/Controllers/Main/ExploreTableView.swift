@@ -8,8 +8,11 @@
 
 import UIKit
 import EzPopup
+import GoogleMobileAds
+import FBAudienceNetwork
+import AdSupport
 
-class ExploreTableView: UITableViewController {
+class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
     
     @IBOutlet weak var newButton: UIButton!
     @IBOutlet weak var hotButton: UIButton!
@@ -30,10 +33,14 @@ class ExploreTableView: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print(ASIdentifierManager.shared().advertisingIdentifier)
         self.tableView.refreshControl = tableRefreshControl
         tableRefreshControl.addTarget(self, action: #selector(self.reloadExploreInput), for: .valueChanged)
         
         setSelectedButton(b: newButton)
+        
+        setupFBAd()
+        
         print("loading clips")
         
         if (Profile.current.id.isEmpty)
@@ -64,13 +71,16 @@ class ExploreTableView: UITableViewController {
     
     func loadCategories() {
         
+        let ad = Clip(url: "", title: "This is an ad!", publisher: "", date: "", platform: Platforms.Advertisement, platformTag: "", id: 0, thumbnail: "", tags: [])
+        
         loaded = false
         var count: Int = 0
         
-        Clip.loadClips(range: 10)
+        Clip.loadClips(range: 8)
         { (clips) in
             print("Loaded new recent clips.")
             self.newClips = Preference.orderByDate(relevantClips: clips)
+            self.newClips.append(ad)
             self.loadedClips = self.newClips
             self.tableView.reloadData()
             
@@ -80,10 +90,11 @@ class ExploreTableView: UITableViewController {
             }
         }
         
-        Placeholders.temporary_preference.findRelevantClips(range: 10)
+        Placeholders.temporary_preference.findRelevantClips(range: 8)
         { (clips) in
             print("Loaded new clips with Preference.")
             self.hotClips = clips
+            self.hotClips.append(ad)
             
             count += 1
             if count == 3 {
@@ -94,7 +105,9 @@ class ExploreTableView: UITableViewController {
         Clip.loadClipsFromSupporting
         { (clips) in
             print("Loaded supporting clips.")
+            
             self.supportingClips = clips
+            self.supportingClips.append(ad)
             
             count += 1
             if count == 3 {
@@ -102,7 +115,40 @@ class ExploreTableView: UITableViewController {
             }
         }
         
+        
+        
         self.tableRefreshControl.endRefreshing()
+    }
+    
+    func loadMore(category: Int) {
+        switch category {
+            // Case 0 = New Clips
+        case 0:
+            Clip.loadClips(range: 8)
+            { (clips) in
+                print("loaded 8 new clips")
+                self.newClips.append(contentsOf: clips)
+                self.tableView.reloadData()
+            }
+            
+            // Case 1 = Hot Clips
+        case 1:
+            Placeholders.temporary_preference.findRelevantClips(range: 8)
+            { (clips) in
+                self.hotClips.append(contentsOf: clips)
+                self.tableView.reloadData()
+            }
+            
+            // Case 2 = Supporting Clips
+        case 2:
+            Clip.loadClipsFromSupporting
+            { (clips) in
+                self.supportingClips.append(contentsOf: clips)
+                self.tableView.reloadData()
+            }
+        default:
+            return
+        }
     }
     
     // MARK: - Table view data source
@@ -112,44 +158,54 @@ class ExploreTableView: UITableViewController {
         return 1
     }
 
+    // MARK: - Number of rows in section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         // MARK: - Will be replaced in near future.
+        
         return loadedClips.count + 1
     }
     
+    // MARK: - Row height
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
         if indexPath.row == 0 {
             return 43
         } else {
+        
             let clip:Clip = loadedClips[indexPath.row - 1]
             
             switch clip.platform {
+            case .Advertisement:
+                return 291
             case .Instagram:
                 return 205
             case .Soundcloud, .Spotify:
                 return 161
             case .Twitch, .Youtube:
-                return 295
+                let temp_cell = VideoTableCell()
+                let height = temp_cell.supportButton.frame.height + temp_cell.videoThumbnail.frame.height + temp_cell.title.frame.height
+                print("video cell detected setting a height of \(height)")
+                return height
             default:
                 return 45
             }
         }
         
-        
-        
     }
     
+    // MARK: - Configure the cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         print("Attempting to setup cell @ \(indexPath.row)")
+        print("Section: \(indexPath.section) | Row: \(indexPath.row)")
         
         if indexPath.row == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "preferenceIdentifier", for: indexPath)
             return cell
             
         } else {
+        
             print("This is a regular cell.")
             
             // Configure the cell...
@@ -297,14 +353,25 @@ class ExploreTableView: UITableViewController {
                 }
                 
                 return cell
-            default:
-                let cell = tableView.dequeueReusableCell(withIdentifier: identifier)! as UITableViewCell
-                print("There was an explore cell that didnt have a valid platform")
-                return cell
+            
+            
+                case.Advertisement:
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "advertisementIdentifier", for: indexPath) as! AdvertisementCell
+                    adViews.append(cell)
+                    
+                    // v This needs to be called in viewDidLoad
+                    //adLoader.load(GADRequest())
+                    nativeAd.loadAd()
+                    
+                    return cell
+                
+                default:
+                    let cell = tableView.dequeueReusableCell(withIdentifier: identifier)! as UITableViewCell
+                    print("There was an explore cell that didnt have a valid platform")
+                    return cell
             }
+            
         }
-        
-        
     }
     
     @IBAction func newButtonPress(_ sender: Any) {
@@ -331,4 +398,92 @@ class ExploreTableView: UITableViewController {
         selected_button = b
         b.backgroundColor = UIColor.init(red: 245/255, green: 245/255, blue: 245/255, alpha: 1/1)
     }
+    
+    // MARK: - Native Ad Manager (AdMob)
+    /*
+    func setupAdLoader() {
+        adLoader = GADAdLoader(adUnitID: adUnitID, rootViewController: self, adTypes: [.unifiedNative], options: nil)
+        adLoader.delegate = self
+    }
+    
+    var adLoader: GADAdLoader!
+    var adUnitID = "ca-app-pub-3940256099942544/3986624511"
+    
+    */
+    
+    // MARK: - Native Ad Manager (FAN)
+    
+    var adViews: [AdvertisementCell] = []
+    
+    func setupFBAd() {
+        nativeAd = FBNativeAd(placementID: "379241669659253_379242252992528")
+        nativeAd.delegate = self;
+    }
+    
+    var nativeAd: FBNativeAd!
 }
+
+extension ExploreTableView: FBNativeAdDelegate {
+    func nativeAdDidLoad(_ nativeAd: FBNativeAd) {
+        self.nativeAd = nativeAd
+        
+        let cell = adViews.last!
+        
+        nativeAd.registerView(forInteraction: cell.adUIView, mediaView: cell.media, iconImageView: cell.icon, viewController: self, clickableViews: [ cell.media, cell.button ])
+        
+        if let advertiser = nativeAd.advertiserName {
+            cell.sponsored.text = advertiser
+        }
+        
+        if let body = nativeAd.bodyText {
+            cell.body.text = body
+        }
+        
+        if let socialContext = nativeAd.socialContext {
+            cell.social_context.text = socialContext
+        }
+        
+        if let callToAction = nativeAd.callToAction {
+            cell.button.setTitle(callToAction, for: .normal)
+        }
+        
+    }
+}
+
+/*extension ExploreTableView: GADVideoControllerDelegate {
+    func videoControllerDidEndVideoPlayback(_ videoController: GADVideoController) {
+        print("Video playback ended")
+    }
+}
+
+extension ExploreTableView: GADUnifiedNativeAdLoaderDelegate {
+    func adLoader(_ adLoader: GADAdLoader, didFailToReceiveAdWithError error: GADRequestError) {
+        print("No ad could be loaded")
+    }
+    
+    func adLoader(_ adLoader: GADAdLoader, didReceive nativeAd: GADUnifiedNativeAd) {
+        
+        print("loading an ad")
+        print("\(adViews) <- rows that are configured as ads. check if row \(adViews.last!) is an AdvertisementCell")
+        let cell = adViews.last!
+        nativeAd.delegate = self
+        
+        let mediaContent = nativeAd.mediaContent
+        
+        print("ad loaded with headline \(nativeAd.headline!)")
+        cell.advertisementText.text = nativeAd.headline!
+        cell.nativeAdViewPlaceholder!.mediaContent = mediaContent
+        if let advertiser = nativeAd.advertiser {
+            cell.secondaryInfo.text = "from: \(advertiser)"
+        }
+        if let callToAction = nativeAd.callToAction {
+            cell.actionButton.titleLabel?.text = callToAction
+        }
+        /*if mediaContent.hasVideoContent {
+            mediaContent.videoController.delegate = self
+        } else {
+            
+        }*/
+        //cell.nativeAdViewPlaceholder = nativeAd.mediaContent.mainImage
+    }
+}*/

@@ -28,7 +28,7 @@ class ImageTableCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        //self.height = 205
+        self.height = 205
         
         let touchGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.imageTapped(_:)))
         touchGesture.delegate = self
