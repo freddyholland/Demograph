@@ -30,16 +30,12 @@ class Preference {
             var toOrder: [Int:Clip] = [:]
             var unorderedList: [Int:Int] = [:]
             
-            print("Under Preference.swift/findRelevantClips(_): downloaded \(loadedClips.count) before filtering.")
-            
             // Initial check - clips filter through if the platform is consistent with the Preference.
             for loadedClip in loadedClips {
                 if self.types.contains(loadedClip.platform) {
                     toOrder[loadedClip.id] = loadedClip
                 }
             }
-            
-            print("Under Preference.swift/findRelevantClips(_): there are \(toOrder.count) clips available after filtering.")
             
             for unorderedClipSet in toOrder
             {
@@ -64,10 +60,7 @@ class Preference {
                 }
             }
             
-            print("unofficially: \(unorderedList)")
-            
             let orderedList = unorderedList.sorted { $1.1 > $0.1 }
-            print("Under Preference.swift/findRelevantClips(_): returning a total \(orderedList.count) clips after complete filtering.")
             
             var forCompletion: [Clip] = []
             for returnedIDSet in orderedList
@@ -85,27 +78,21 @@ class Preference {
     public static func supportingClips(profile: Profile, completion: @escaping (_ clips: [Int]) -> Void) {
         
         var count = 0
-        print("% if \(profile.supporting?.count) > 0")
         if profile.supporting?.count != 0
         {
-            print("passed")
+            
             let supporting = profile.supporting!
             var mediaIDs: [Int] = []
             for prof in supporting
             {
-                print("Under Preference.swift: attempting to download all media data from \(prof) UID. ")
                 Account.getProfile(userID: prof)
                 { (userProfile) in
-                    print("unofficially after download: \(userProfile.local_tag) & \(userProfile.clips?.count)")
                     if userProfile.clips?.count != 0
                     {
-                        print("\(userProfile.clips?.count) clips have been downloaded from under 'Account.getProfile(_)'.")
                         mediaIDs.append(contentsOf: userProfile.clips!)
                     }
                     count += 1
-                    print("Under Preference.swift: there are ( \(count)/\(supporting.count) ) supported users been read, with a returning \(mediaIDs.count) clips.")
                     if count == supporting.count {
-                        print("Completion fired with \(mediaIDs.count) clips returning.")
                         completion(mediaIDs)
                     }
                 }
@@ -145,31 +132,29 @@ class Preference {
         
         let ref = Firestore.firestore().collection("users").document(forUser)
         
-        print("attempting to load preference from ref-point")
+        
         let preference: Preference = Preference(types: [], tags: [])
         ref.getDocument
             { (snapshot, err) in
                 
                 if let err = err {
                     //DGAlert.errorAlert(with: 205, controller: self)
-                    print(err)
+                    
                     return
                 }
                 
-                print("no errors occurred")
+                
                 
                 if let snap_platforms = snapshot?.get("preferred_platforms") {
-                    print("successfully downloaded at least 1 platform")
+                    
                     
                     let platformStrings = snap_platforms as! [String]
                     var platforms: [Platforms] = []
                     for string in platformStrings {
-                        print("cycling through platform \(string)")
                         platforms.append(Platforms(rawValue: string)!)
                     }
                     
                     preference.types = platforms
-                    print("\(platforms.count) platforms returned.")
                     
                 }
                 

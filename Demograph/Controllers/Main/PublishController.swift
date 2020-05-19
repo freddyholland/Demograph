@@ -62,41 +62,39 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
         
         
         if Profile.current.id.isEmpty {
-            print("Current ID is empty")
+            
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true, block: {
                 timer in
-                print("checking if value changed")
+                
                 if !Profile.current.id.isEmpty {
-                    print("value changed!")
+                    
                     self.userAccount = Profile.current
                     self.reloadData()
                     timer.invalidate()
                 }
             })
         } else {
-            print("Data is loaded: reloading controller")
+            
             self.userAccount = Profile.current
             reloadData()
         }
     }
     
     func loadAllContent() {
-        print("Reloading all content on profile.")
+        
         allowModification = false
         Profile.attemptLoadCurrent(completion: {
             success in
-            print("Attempting to load current")
+            
             if success {
-                print("great success")
+                
                 self.userAccount = Profile.current
                 
                 self.reloadData()
-                
-                print("### Loaded all profile data. \(Profile.current.local_tag)")
             } else {
                 DGAlert.errorAlert(with: 202, controller: self)
                 self.allowModification = true
-                print("### An error occurred retrieving profile information")
+                
             }
         })
         
@@ -116,7 +114,7 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
         }
         
         if userAccount.getShareablePlatforms().count == 0 {
-            print("You do not have any shareable platforms.")
+            
             DGAlert.errorAlert(with: 301, controller: self)
             return
         }
@@ -137,10 +135,6 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
             DGAlert.errorAlert(with: 501, controller: self)
             return
         }
-        
-        print("attempting to get platform type to download data")
-        print(pickerView.selectedRow(inComponent: 0))
-        print(userAccount.getShareablePlatforms().count)
         
         let platform: Platform = userAccount.getShareablePlatforms()[pickerView.selectedRow(inComponent: 0)]
         
@@ -170,9 +164,9 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                     { (success) in
                     
                         if success {
-                            print("Successfully uploaded post.")
+                            
                         } else {
-                            print("Error uploading post.")
+                            
                             DGAlert.errorAlert(with: 204, controller: self)
                         }
                 })
@@ -196,9 +190,9 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                     { (success) in
                     
                         if success {
-                            print("Successfully uploaded post.")
+                            
                         } else {
-                            print("Error uploading post.")
+                            
                             DGAlert.errorAlert(with: 204, controller: self)
                         }
                 })
@@ -222,9 +216,9 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                     { (success) in
                     
                         if success {
-                            print("Successfully uploaded post.")
+                            
                         } else {
-                            print("Error uploading post.")
+                            
                             DGAlert.errorAlert(with: 204, controller: self)
                         }
                 })
@@ -248,9 +242,9 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                     { (success) in
                     
                         if success {
-                            print("Successfully uploaded post.")
+                            
                         } else {
-                            print("Error uploading post.")
+                            
                             DGAlert.errorAlert(with: 204, controller: self)
                         }
                 })
@@ -279,15 +273,15 @@ class PublishController: UIViewController, UITextFieldDelegate, UIPickerViewDele
                     { (success) in
                     
                         if success {
-                            print("Successfully uploaded post.")
+                            
                         } else {
-                            print("Error uploading post.")
+                            
                             DGAlert.errorAlert(with: 204, controller: self)
                         }
                 })
             }
         default:
-            print("This platform is not configured to share content.")
+            
             return
         }
     }

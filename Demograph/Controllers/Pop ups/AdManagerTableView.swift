@@ -65,18 +65,25 @@ class AdManagerTableView: UITableViewController, InputAlertDelegate {
     }
     
     func onBooleanInput(result: Bool) {
-        let cell = tableView.cellForRow(at: selected_index) as! ClipInfoCell
-        let id = cell.id!
         
-        // Remove the clip from /clips/{id} reference.
-        Profile.current.removeClip(withID: id)
-        { (result) in
-            if result == false {
-                DGAlert.errorAlert(with: 207, controller: self)
-            } else {
-                DGAlert.alert(withTitle: "Success!", message: "You successfully deleted a clip.", controller: self)
+        if result == true {
+            let cell = tableView.cellForRow(at: selected_index) as! ClipInfoCell
+            let id = cell.id!
+            
+            // Remove the clip from /clips/{id} reference.
+            Profile.current.removeClip(withID: id)
+            { (result) in
+                if result == false {
+                    DGAlert.errorAlert(with: 207, controller: self)
+                } else {
+                    DGAlert.alert(withTitle: "Success!", message: "You successfully deleted a clip.", controller: self)
+                    
+                }
             }
+        } else {
+            self.dismiss(animated: true, completion: nil)
         }
+        
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -84,7 +91,9 @@ class AdManagerTableView: UITableViewController, InputAlertDelegate {
     }
     
     func reloadData() {
-        Firestore.firestore().collection("clips").whereField("id", in: Profile.current.clips!).limit(to: 20).getDocuments
+        let clip_ids: [Int] = Array(Profile.current.clips!.prefix(10))
+        
+        Firestore.firestore().collection("clips").whereField("id", in: clip_ids).getDocuments
             { (snapshot, error) in
             
                 if let error = error {

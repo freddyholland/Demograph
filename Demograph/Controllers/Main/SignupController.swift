@@ -47,12 +47,12 @@ class SignupController: UIViewController {
             return
         }
         if password != confirmedPassword {
-            print("Two passwords don't match")
+            
             DGAlert.errorAlert(with: 102, controller: self)
             return
         }
         if(username.count < 4) {
-            print("User tag is less than 4 chars.")
+            
             DGAlert.errorAlert(with: 104, controller: self)
             return
         }
@@ -66,20 +66,20 @@ class SignupController: UIViewController {
                 Account.create(email: email, password: password, local_tag: username, name: fullName, platforms: [], completionHandler: {
                     (result, error) in
                     if let error = error {
-                        print(error)
+                        
                         return
                     }
                     
                     if result == true {
-                        print("account created")
+                        
                         //self.dismiss(animated: true, completion: nil)
                     } else {
-                        print("account was not created because 'result' equaled false")
+                        
                         DGAlert.errorAlert(with: 203, controller: self)
                     }
                 })
             } else {
-                print("The username is already in use.")
+                
                 DGAlert.errorAlert(with: 103, controller: self)
             }
         })

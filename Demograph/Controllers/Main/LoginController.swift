@@ -24,11 +24,12 @@ class LoginController: UIViewController, UITextFieldDelegate {
         passwordField.delegate = self
         
         // Check if user is signed in
-        
         Auth.auth().addStateDidChangeListener({
             (auth, user) in
             if user != nil {
                 self.segueToMainView()
+            } else {
+                self.dismiss(animated: true, completion: nil)
             }
         })
     }
@@ -36,13 +37,13 @@ class LoginController: UIViewController, UITextFieldDelegate {
     @IBAction func loginPressed(_ sender: Any) {
         
         guard let email = emailField.text, !email.isEmpty else {
-            print("Email field is not filled in")
+            
             DGAlert.errorAlert(with: 101, controller: self)
             return
         }
         
         guard let password = passwordField.text, !password.isEmpty else {
-            print("Password field is not filled in")
+            
             DGAlert.errorAlert(with: 101, controller: self)
             return
         }
@@ -53,11 +54,11 @@ class LoginController: UIViewController, UITextFieldDelegate {
             (success, error) in
             self.activityIndicator.stopAnimating()
             if success {
-                print("logged in")
+                
                 self.segueToMainView()
             } else {
                 DGAlert.errorAlert(with: 201, controller: self)
-                print(error!)
+                
             }
         })
     }
@@ -70,7 +71,7 @@ class LoginController: UIViewController, UITextFieldDelegate {
             success in
             
             if success {
-                print("Successfully loaded current controller.")
+                
             } else {
                 DGAlert.errorAlert(with: 202, controller: self)
             }

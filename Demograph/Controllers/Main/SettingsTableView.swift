@@ -13,25 +13,10 @@ class SettingsTableView: UITableViewController {
     
     
     let settings: [String] = ["Username", "Full Name", "Bio", "Picture", "Banner"]
-    let management: [String] = ["Manage Platforms", "Manage Ads", "Demograph Premium"]
+    let management: [String] = ["Manage Platforms", "Manage Ads", /*"Demograph Premium"*/]
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        Profile.attemptLoadCurrent(completion: {
-            success in
-            if success {
-                print("Current profile successfully loaded.")
-            } else {
-                print("An error occurred loading the profile.")
-            }
-        })
-        
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
 
     // MARK: - Table view data source
@@ -61,7 +46,7 @@ class SettingsTableView: UITableViewController {
             try Auth.auth().signOut()
             self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
         } catch let signoutError as NSError {
-            print("Error signing out: %@", signoutError)
+            print(signoutError)
         }
     }
     
@@ -103,42 +88,40 @@ class SettingsTableView: UITableViewController {
             row += 5
         }
         
-        print("selected row \(row)")
-        
         if row == 0 {
             // MARK:- USERNAME
-            print("### Row pressed. Receiving user input.")
+            
             let alertController = UIAlertController(title: "Username:", message: "Please enter username.", preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "Done", style: .default, handler: {
                 (alert) in
                 
-                print("### Input confirmed.")
+                
                 let nameField = alertController.textFields![0] as UITextField
                 guard let name = nameField.text, !name.isEmpty else {
-                    print("Empty usernameField")
+                    
                     return
                 }
                 if name.count < 4 {
-                    print("username too short")
+                    
                     return
                 }
-                print("### Stage 1 passed.")
+                
                 Account.userTagExists(user_tag: name, completionHandler: {
                     exists in
                     if !exists {
-                        print("### Stage 2 passed.")
+                        
                         Profile.current.local_tag = name
                         Profile.attemptSaveCurrent(completion: {
                             success in
                             if success {
-                                print("Successfully updated the name in the database.")
+                                
                             } else {
-                                print("Error saving.")
+                                
                             }
                         })
                     } else {
                         // MARK:- TODO: close alert view and open new one
-                        print("### ERROR! The username already exists")
+                        
                     }
                 })
             }))
@@ -157,15 +140,14 @@ class SettingsTableView: UITableViewController {
                 
                 let nameField = alertController.textFields![0] as UITextField
                 guard let name = nameField.text, !name.isEmpty else {
-                    print("Empty fullnameField")
+                    
                     return
                 }
-                print("Set fullname to \(name)")
                 Profile.current.name = name
                 Profile.attemptSaveCurrent(completion: {
                     success in
                     if success {
-                        print("Successfully updated the name in the database.")
+                        
                     }
                 })
             }))
@@ -184,15 +166,15 @@ class SettingsTableView: UITableViewController {
                 
                 let nameField = alertController.textFields![0] as UITextField
                 guard let name = nameField.text, !name.isEmpty else {
-                    print("Empty biofield")
+                    
                     return
                 }
-                print("Set bio to \(name)")
+                
                 Profile.current.bio = name
                 Profile.attemptSaveCurrent(completion: {
                     success in
                     if success {
-                        print("Successfully updated the bio in the database.")
+                        
                     }
                 })
             }))
@@ -224,7 +206,7 @@ class SettingsTableView: UITableViewController {
             let adManager = self.storyboard?.instantiateViewController(withIdentifier: "adManagerTableView") as! AdManagerTableView
             self.present(adManager, animated: true, completion: nil)
         } else if row == 7 {
-            print("Manage premium subscription.")
+            
         }
     }
 

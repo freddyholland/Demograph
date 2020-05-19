@@ -93,6 +93,9 @@ class Account {
     }
     
     public static func userTagExists(user_tag: String, completionHandler: @escaping (_ success: Bool) -> Void) {
+        
+        Firestore.firestore().collection("users").whereField("local_tag", in: [user_tag])
+        
         Firestore.firestore().collection("users").getDocuments(completion: {
             (snapshot, error) in
             if let error = error {
@@ -164,7 +167,6 @@ class Account {
                 }
                 
                 if snapshot?.get("platforms") != nil {
-                    print("grabbing items from /platforms")
                     let platformArrays = snapshot?.get("platforms") as! [[String:String]]
                     var platforms:[Platform] = []
                     for platformArray in platformArrays {
@@ -174,7 +176,6 @@ class Account {
                 }
                 
                 if snapshot?.get("supporting") != nil {
-                    print("grabbing items from /supporting")
                     let supporting = snapshot?.get("supporting") as! [String]
                     profile.supporting = supporting
                 } else {
@@ -182,7 +183,6 @@ class Account {
                 }
                 
                 if snapshot?.get("clips") != nil {
-                    print("grabbing items from /clips")
                     let clips = snapshot?.get("clips") as! [Int]
                     profile.clips = clips
                 } else {
@@ -192,18 +192,13 @@ class Account {
                 Bucket.getUserPicture(id: userID, completion: {
                     image in
                     profile.picture = image
-                    print("Picture image loaded")
                     Bucket.getUserBanner(id: userID, completion: {
                         image in
                         profile.banner = image
-                        print("Banner image loaded")
                         
                         completion(profile)
-                        print("Profile returned in completion handler")
                     })
                 })
-                
-                print("### \(profile.local_tag), \(profile.name), \(profile.id)")
             }
             
         })

@@ -28,7 +28,6 @@ class AudioTableCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        self.height = 161
         
         if (clip.publisher.isEmpty) || (Profile.current.id.isEmpty)
         {

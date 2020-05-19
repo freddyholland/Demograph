@@ -35,7 +35,11 @@ class Clip {
     func save() {
         // MARK: - Save the clip to the database under 'ID'
         let id:String = "\(self.id)"
+        
+        // Get the document reference.
         let doc = Firestore.firestore().collection("clips").document(id)
+        
+        // Transform the Clip into a dictionary.
         let data: [String:Any] = [
             "id":self.id,
             "title":self.title,
@@ -52,15 +56,14 @@ class Clip {
         
         Firestore.firestore().collection("users").document(self.publisher).getDocument
         { (snapshot, err) in
-            if let err = err {
-                print(err)
+            if let _ = err {
+                print("An error occurred while trying to save a clip to the database.")
                 return
             }
             
             var clips: [Int] = snapshot?.get("clips") as! [Int]
-            print("$$ saving clips to database: gathered pre-existing clips.")
+            
             if clips.count != 0 {
-                print("$$ there are pre-existing clips: \(clips). adding \(self.id) to the array.")
                 clips.append(self.id)
                 Firestore.firestore().collection("users").document(self.publisher).setData(["clips":clips], merge: true)
             }
@@ -106,15 +109,13 @@ class Clip {
         Firestore.firestore().collection("clips").document("\(from)").getDocument(completion: {
             (snapshot, error) in
             if let error = error {
-                print("An error occurred downloading a clip.")
-                print("## \(error)")
                 return
             }
             
             //let _ = Clip(url: *, title: *, date: *, time: *, platform: *, platformTag: *, id: *, tags: *, votes: -)
-            print("Successfully downloaded snapshot.")
+            
             if(snapshot?.get("title") != nil) {
-                print("title exists")
+                
                 let title:String = snapshot?.get("title") as! String
                 let publisher:String = snapshot?.get("publisher") as! String
                 let url:String = snapshot?.get("url") as! String
@@ -159,13 +160,12 @@ class Clip {
             
                 if let error = error
                 {
-                    print("Error retrieving data collection.")
-                    print(error)
+                    
+                    
                     completion([])
                 } else
                 {
                     var loaded: [Clip] = []
-                    print("There are \(snapshot!.count) clips downloaded out of the specified \(range).")
                     for clipData in snapshot!.documents {
                         let clip = getClip(from: clipData.data())
                         loaded.append(clip)

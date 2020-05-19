@@ -59,7 +59,7 @@ class ProfileTableView: UIViewController, UITableViewDataSource, UITableViewDele
             return
         }
         
-        print("did select row")
+        
         let alertView = UIAlertController(title: "Platform Options", message: "", preferredStyle: .alert)
         alertView.addAction(UIAlertAction(title: "Back", style: .default, handler: {
             (alert) in
@@ -72,10 +72,10 @@ class ProfileTableView: UIViewController, UITableViewDataSource, UITableViewDele
             Profile.attemptSaveCurrent(completion: {
                 success in
                 if success {
-                    print("successfully deleted requested platform")
+                    
                     self.loadAllContent()
                 } else {
-                    print("platform couldnt be deleted")
+                    
                     self.allowModification = true
                 }
             })
@@ -94,19 +94,19 @@ class ProfileTableView: UIViewController, UITableViewDataSource, UITableViewDele
         reload.addTarget(self, action: #selector(self.reloadFullPage), for: .valueChanged)
         
         if Profile.current.id.isEmpty {
-            print("Current ID is empty")
+            
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true, block: {
                 timer in
-                print("checking if value changed")
+                
                 if !Profile.current.id.isEmpty {
-                    print("value changed!")
+                    
                     self.userAccount = Profile.current
                     self.reloadData()
                     timer.invalidate()
                 }
             })
         } else {
-            print("Data is loaded: reloading controller")
+            
             self.userAccount = Profile.current
             reloadData()
         }
@@ -119,21 +119,20 @@ class ProfileTableView: UIViewController, UITableViewDataSource, UITableViewDele
     }
     
     func loadAllContent() {
-        print("Reloading all content on profile.")
+        
         allowModification = false
         Profile.attemptLoadCurrent(completion: {
             success in
-            print("Attempting to load current")
+            
             if success {
-                print("great success")
+                
                 self.userAccount = Profile.current
                 
                 self.reloadData()
                 
-                print("### Loaded all profile data. \(Profile.current.local_tag)")
             } else {
                 self.allowModification = true
-                print("### An error occurred retrieving profile information")
+                
             }
         })
         

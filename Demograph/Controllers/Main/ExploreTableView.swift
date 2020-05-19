@@ -33,7 +33,6 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(ASIdentifierManager.shared().advertisingIdentifier)
         self.tableView.refreshControl = tableRefreshControl
         tableRefreshControl.addTarget(self, action: #selector(self.reloadExploreInput), for: .valueChanged)
         
@@ -41,7 +40,8 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
         
         setupFBAd()
         
-        print("loading clips")
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 500
         
         if (Profile.current.id.isEmpty)
         {
@@ -78,7 +78,6 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
         
         Clip.loadClips(range: 8)
         { (clips) in
-            print("Loaded new recent clips.")
             self.newClips = Preference.orderByDate(relevantClips: clips)
             self.newClips.append(ad)
             self.loadedClips = self.newClips
@@ -92,7 +91,6 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
         
         Placeholders.temporary_preference.findRelevantClips(range: 8)
         { (clips) in
-            print("Loaded new clips with Preference.")
             self.hotClips = clips
             self.hotClips.append(ad)
             
@@ -104,7 +102,6 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
         
         Clip.loadClipsFromSupporting
         { (clips) in
-            print("Loaded supporting clips.")
             
             self.supportingClips = clips
             self.supportingClips.append(ad)
@@ -126,7 +123,6 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
         case 0:
             Clip.loadClips(range: 8)
             { (clips) in
-                print("loaded 8 new clips")
                 self.newClips.append(contentsOf: clips)
                 self.tableView.reloadData()
             }
@@ -183,10 +179,7 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
             case .Soundcloud, .Spotify:
                 return 161
             case .Twitch, .Youtube:
-                let temp_cell = VideoTableCell()
-                let height = temp_cell.supportButton.frame.height + temp_cell.videoThumbnail.frame.height + temp_cell.title.frame.height
-                print("video cell detected setting a height of \(height)")
-                return height
+                return 300
             default:
                 return 45
             }
@@ -194,24 +187,39 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
         
     }
     
+    /*override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == 0 {
+            return 43
+        } else {
+        
+            let clip:Clip = loadedClips[indexPath.row - 1]
+            
+            switch clip.platform {
+            case .Advertisement:
+                return 291
+            case .Instagram:
+                return 205
+            case .Soundcloud, .Spotify:
+                return 161
+            case .Twitch, .Youtube:
+                return 280
+            default:
+                return 45
+            }
+        }
+    }*/
+    
     // MARK: - Configure the cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        print("Attempting to setup cell @ \(indexPath.row)")
-        print("Section: \(indexPath.section) | Row: \(indexPath.row)")
         
         if indexPath.row == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "preferenceIdentifier", for: indexPath)
             return cell
             
         } else {
-        
-            print("This is a regular cell.")
             
             // Configure the cell...
             let clip: Clip = loadedClips[indexPath.row-1]
-            print("The publisher ID is: " + clip.publisher)
-            print("Loaded for the clip with ID: \(clip.id)")
             var identifier = clip.platform.rawValue + "_identifier"
             
             switch clip.platform {
@@ -221,7 +229,6 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
                 
                 identifier = "image_identifier"
                 let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as! ImageTableCell
-                cell.height = 205
                 cell.clip = clip
                 cell.controller = self
                 
@@ -266,7 +273,6 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as! AudioTableCell
                 cell.clip = clip
-                cell.height = 161
                 
                 cell.title.text = clip.title
                 cell.firstNameLabel.text = "Posted on Soundcloud"
@@ -281,7 +287,6 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as! VideoTableCell
                 cell.clip = clip
-                cell.height = 300
                 cell.link = clip.url
                 cell.controller = self
                 
@@ -298,7 +303,6 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as! AudioTableCell
                 cell.clip = clip
-                cell.height = 161
                 
                 cell.title.text = clip.title
                 cell.firstNameLabel.text = "Posted on Spotify"
@@ -312,9 +316,7 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
                 identifier = "video_identifier"
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as! VideoTableCell
-                print("In ETV clip publisher equals \(clip.publisher)")
                 cell.clip = clip
-                cell.height = 300
                 cell.link = clip.url
                 cell.controller = self
                 
@@ -367,7 +369,6 @@ class ExploreTableView: UITableViewController, GADUnifiedNativeAdDelegate {
                 
                 default:
                     let cell = tableView.dequeueReusableCell(withIdentifier: identifier)! as UITableViewCell
-                    print("There was an explore cell that didnt have a valid platform")
                     return cell
             }
             
@@ -452,25 +453,25 @@ extension ExploreTableView: FBNativeAdDelegate {
 
 /*extension ExploreTableView: GADVideoControllerDelegate {
     func videoControllerDidEndVideoPlayback(_ videoController: GADVideoController) {
-        print("Video playback ended")
+        "Video playback ended")
     }
 }
 
 extension ExploreTableView: GADUnifiedNativeAdLoaderDelegate {
     func adLoader(_ adLoader: GADAdLoader, didFailToReceiveAdWithError error: GADRequestError) {
-        print("No ad could be loaded")
+        "No ad could be loaded")
     }
     
     func adLoader(_ adLoader: GADAdLoader, didReceive nativeAd: GADUnifiedNativeAd) {
         
-        print("loading an ad")
-        print("\(adViews) <- rows that are configured as ads. check if row \(adViews.last!) is an AdvertisementCell")
+        "loading an ad")
+        "\(adViews) <- rows that are configured as ads. check if row \(adViews.last!) is an AdvertisementCell")
         let cell = adViews.last!
         nativeAd.delegate = self
         
         let mediaContent = nativeAd.mediaContent
         
-        print("ad loaded with headline \(nativeAd.headline!)")
+        "ad loaded with headline \(nativeAd.headline!)")
         cell.advertisementText.text = nativeAd.headline!
         cell.nativeAdViewPlaceholder!.mediaContent = mediaContent
         if let advertiser = nativeAd.advertiser {
